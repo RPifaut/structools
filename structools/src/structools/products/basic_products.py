@@ -1,30 +1,47 @@
 import numpy as np
 from pydantic import BaseModel, Field, validator
+from typing import List
 from src.structools.tools.date_tools import DateModel
 
 L_OPTIONS = ["CALL", "PUT"]
 
 
 
-class Underlying:
+class Underlying(BaseModel):
+
+    class Config:
+
+        arbitrary_types_allowed=True
 
 
-    """
-    
-    General class for the modelling of the underlyings. The types currently available are:
-    - Single stock/index
-    - N Worst-Of Baskets
-    - N Best-Of Baskets
-    - Equally Weighted Baskets
-    - Custom Weights Baskets
+    size : int = Field(1)
+    name : str                      
+    N : int = Field(1)                  
+    WORST : bool = False                
+    BEST : bool = False      
+    COMPO : List[str] = Field(
+        default_factory=list,
+        description="List of components in the Underlying.",
+        min_items=1
+    ) 
+    WEIGHTS : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array of weights for the underlying."
+    )
 
-    """
+    @validator("WEIGHTS", pre=True)
+    def validate_weights(cls, arr_weights):
 
-    size : int = 1                      # Number of components in the underlying, default: 1
-    N : int = 1                         # Number of the components used for the compute the underlying performance, default: 1
-    WORST : bool = False                # True  if the underlying is a Worst-Of
-    BEST : bool = False                 # True if the underlying is a Best-Of
-    WEIGHTS : np.array = np.array([1])  # Array containing the weights assigned to each underlying in the case of a custom basket, default: np.array([1])
+        # Check whether the list is empty of not
+        if isinstance(arr_weights, np.ndarray):
+            if len(list(arr_weights)) == 0:
+                raise ValueError(f"Weights list cannot be empty.")
+        
+        # Check the validity of the input
+        if not np.issubdtype(arr_weights.dtype, np.number):
+            raise TypeError(f"Array can only contain integers or floats. Got {arr_weights.dtype}.")
+        
+        return arr_weights
 
 
 class OptionBaseModel(BaseModel):
