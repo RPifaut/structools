@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.4.0 (2024-12-01)
+
+### Features
+
+- Adding a getter to Autocalls + initialisation of the threshold values
+  ([`349dd80`](https://github.com/RPifaut/structools/commit/349dd80f36b0963d962862f48e10f46b9e382dfc))
+
+
 ## v0.3.0 (2024-12-01)
 
 ### Features
