@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.5.0 (2024-12-01)
+
+### Features
+
+- Creation of the market + adding string representation of DateModel values
+  ([`10f4c90`](https://github.com/RPifaut/structools/commit/10f4c90815f717f3daaf3b21db4db0e51a6f7216))
+
+
 ## v0.4.0 (2024-12-01)
 
 ### Features
