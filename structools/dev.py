@@ -34,14 +34,15 @@ my_underlying = Underlying(
 # Parameters for the Autocall
 strike_date = strike_date
 underlying = my_underlying
-matu = 5
-start_recall = 1
-recall_freq = "A"
+matu = 10
+start_recall = 4
+recall_freq = "Q"
 first_trigger = 1
 step_down = 0
 
 coupon = 0.05
 coupon_trigger = first_trigger
+start_coupon = 1
 coupon_freq = "A"
 is_memory = True
 
@@ -56,18 +57,18 @@ put_barrier_obs = "EUROPEAN"
 kg = 0
 
 my_athena = Athena.from_params(
-    strike_date, my_underlying, matu, None, start_recall, recall_freq, first_trigger, step_down, coupon, coupon_freq, call_strike,
+    strike_date, my_underlying, matu, None, start_recall, recall_freq, first_trigger, step_down, coupon, coupon_freq, start_coupon, call_strike,
     call_leverage, call_cap, put_strike, put_barrier, put_leverage, put_barrier_obs, kg
 )
 
 my_phoenix = Phoenix.from_params(
-    strike_date, underlying, matu, "EUR", start_recall, recall_freq, first_trigger, step_down, coupon, coupon_trigger, coupon_freq, is_memory, call_strike, call_leverage,
+    strike_date, underlying, matu, "EUR", start_recall, recall_freq, first_trigger, 0.05, coupon, coupon_trigger, start_coupon, coupon_freq, is_memory, call_strike, call_leverage,
     call_cap, put_strike, put_barrier, put_leverage, put_barrier_obs, kg
 )
 
-print(my_athena.__dict__)
+print(my_athena.arr_recall_trigger)
 
-print(my_phoenix.__dict__)
+print(my_phoenix.arr_recall_trigger)
 
 
 

@@ -37,8 +37,8 @@ def build_trigger_array(init_val : float = 1.0, step_down : float = 0.0, first_r
     if first_recall < 0:
         raise ValueError(f"First recall cannot be negative. Got {first_recall}.")
     
-
-    return np.array([999 if i < first_recall else init_val - step_down * (i - first_recall) for i in range(size)])
+    start = first_recall - 1
+    return np.array([999 if i < start else init_val - step_down * (i - start) for i in range(size)])
 
 
 
@@ -56,22 +56,24 @@ class Autocall(BaseModel):
         extra = "forbid"                    # Forbid the creation of extra fields in child classes
         frozen = False                      # Allow for mutations using setters
 
+
     # General features for all autocallable products
     strike_date : DateModel
     underlying : Union[Underlying, None]
-    maturity : float
+    maturity : int
     currency : Union[str, None]
     
     # Recall features
     start_recall : int = Field(1, gt=0)
     recall_freq : str 
-    first_trigger : float = Field(1.0, gt=0)
+    first_trigger : float = Field(1.0, ge=1)
     step_down : float = Field(0.0, ge=0)
 
 
     # Coupon features
     coupon : float = Field(ge=0)
     coupon_trigger : float = Field(ge=0)
+    start_coupon : int = Field(1, ge=0)
     coupon_freq : str
     is_memory : bool
 
@@ -129,6 +131,16 @@ class Autocall(BaseModel):
         setattr(self, attribute_name, value)
 
 
+    def get_parameter(self, attribute_name : str):
+
+        if attribute_name not in self.model_fields:
+            raise AttributeError(f"Cannot return a value for attribute {attribute_name} as it is not a class attribute of the Phoenix object.")
+        else:
+            return getattr(self, attribute_name)
+
+    
+
+
 
 class Phoenix(Autocall):
 
@@ -136,7 +148,7 @@ class Phoenix(Autocall):
     def from_params(cls, 
                     strike_date : DateModel,
                     underlying : Underlying,
-                    maturity : float, 
+                    maturity : int, 
                     currency : str,
                     start_recall : int, 
                     recall_freq : str, 
@@ -144,6 +156,7 @@ class Phoenix(Autocall):
                     step_down : float, 
                     coupon : float,
                     coupon_trigger : float,
+                    start_coupon : int, 
                     coupon_freq : str,
                     is_memory : bool,
                     call_strike : float, 
@@ -155,6 +168,13 @@ class Phoenix(Autocall):
                     put_barrier_observ : str,
                     kg : float):
         
+        # Definition of the triggers arrays
+        n_obs_recall = DICT_MATCH_FREQ[recall_freq]
+        n_obs_coupon = DICT_MATCH_FREQ[coupon_freq]
+        arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
+        arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_coupon * maturity)
+
+
         return cls(
             strike_date=strike_date, 
             underlying=underlying,
@@ -166,6 +186,7 @@ class Phoenix(Autocall):
             recall_freq=recall_freq, 
             coupon=coupon, 
             coupon_trigger=coupon_trigger, 
+            start_coupon=start_coupon,
             coupon_freq=coupon_freq,
             is_memory=is_memory,
             call_strike=call_strike,
@@ -175,8 +196,11 @@ class Phoenix(Autocall):
             put_barrier=put_barrier,
             put_leverage=put_leverage,
             put_barrier_observ=put_barrier_observ,
-            kg=kg
+            kg=kg,
+            arr_recall_trigger=arr_recall_triggers,
+            arr_coupon_trigger=arr_coupon_triggers
         )
+
     
 
 class Athena(Autocall):
@@ -193,6 +217,7 @@ class Athena(Autocall):
                     step_down : float, 
                     coupon : float, 
                     coupon_freq : str, 
+                    start_coupon : int,
                     call_strike : float,
                     call_leverage : float, 
                     call_cap : float,
@@ -205,6 +230,11 @@ class Athena(Autocall):
         """
         Default function to create an instance of an Athena product.
         """
+
+        # In the case of an Athena structure, coupons are paid upon redemption. Therefore coupon and recall triggers are the same
+        n_obs_recall = DICT_MATCH_FREQ[recall_freq]
+        arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
+
         
         return cls(
             strike_date=strike_date, 
@@ -216,7 +246,8 @@ class Athena(Autocall):
             start_recall=start_recall,
             recall_freq=recall_freq, 
             coupon=coupon, 
-            coupon_trigger=first_trigger, 
+            coupon_trigger=first_trigger,
+            start_coupon=start_coupon, 
             coupon_freq=coupon_freq,
             is_memory=True,
             call_strike=call_strike,
@@ -226,5 +257,7 @@ class Athena(Autocall):
             put_barrier=put_barrier,
             put_leverage=put_leverage,
             put_barrier_observ=put_barrier_observ,
-            kg=kg
+            kg=kg,
+            arr_recall_trigger=arr_recall_triggers,
+            arr_coupon_trigger=arr_recall_triggers
         )
