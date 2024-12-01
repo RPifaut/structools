@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.3.0 (2024-12-01)
+
+### Features
+
+- Adding arrays of triggers and dates for the autocalls.
+  ([`621d664`](https://github.com/RPifaut/structools/commit/621d664ecbc6e5fc55caebc0daa12839d84d2a5f))
+
+
 ## v0.2.0 (2024-12-01)
 
 ### Features
