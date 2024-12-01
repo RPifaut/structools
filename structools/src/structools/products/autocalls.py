@@ -50,14 +50,11 @@ def build_trigger_array(init_val : float = 1.0, step_down : float = 0.0, first_r
 
 class Autocall(BaseModel):
 
-    """
-    General class for the modeling of autocallablestructures. Please note that 
-
-    - The product's maturity is expressed annually.
-    - The values of the products's thresholds are expressed in fraction of the strike price.
-    - The Coupon value must be exressed in annual terms.
-
-    """
+    class Config:
+        
+        arbitrary_types_allowed = True      # Allow the template to use inputs with types different from Python default types
+        extra = "forbid"                    # Forbid the creation of extra fields in child classes
+        frozen = False                      # Allow for mutations using setters
 
     # General features for all autocallable products
     strike_date : DateModel
@@ -89,6 +86,22 @@ class Autocall(BaseModel):
     put_leverage : float = Field(0.0, ge=0)
     put_barrier_observ : str
     kg : float = Field(0.0, ge=0)
+
+
+    # --------------------------------------------------------------------
+    # Common Methods to all Autocalls
+    # --------------------------------------------------------------------
+
+    def set_parameter(self, attribute_name : str, value):
+
+        if attribute_name not in self.model_fields:
+            raise AttributeError(f"Impossible to create or change the value of attribute {attribute_name}.")
+        
+        if not isinstance(value, type(getattr(self, attribute_name))):
+            raise TypeError(f"Expected {type(getattr(self, attribute_name)).__name__}. Got {type(value).__name__}")
+        
+        setattr(self, attribute_name, value)
+
 
 
 class Phoenix(Autocall):
@@ -153,9 +166,7 @@ class Athena(Autocall):
                     first_trigger, 
                     step_down,
                     coupon,
-                    coupon_trigger,
                     coupon_freq, 
-                    is_memory,
                     call_strike,
                     call_leverage,
                     call_cap,
@@ -175,9 +186,9 @@ class Athena(Autocall):
             start_recall=start_recall,
             recall_freq=recall_freq, 
             coupon=coupon, 
-            coupon_trigger=coupon_trigger, 
+            coupon_trigger=first_trigger, 
             coupon_freq=coupon_freq,
-            is_memory=is_memory,
+            is_memory=True,
             call_strike=call_strike,
             call_leverage=call_leverage,
             call_cap=call_cap,

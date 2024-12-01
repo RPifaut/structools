@@ -11,10 +11,12 @@ class Underlying(BaseModel):
 
     class Config:
 
-        arbitrary_types_allowed=True
+        arbitrary_types_allowed = True
+        extra = "forbid"
+        frozen = False
 
 
-    size : int = Field(1)
+    size : float = Field(1)
     name : str                      
     N : int = Field(1)                  
     WORST : bool = False                
@@ -42,9 +44,31 @@ class Underlying(BaseModel):
             raise TypeError(f"Array can only contain integers or floats. Got {arr_weights.dtype}.")
         
         return arr_weights
+    
+
+    # --------------------------------------------------------------------
+    # Common Methods to all Underlyings
+    # --------------------------------------------------------------------
+
+    def set_parameter(self, attribute_name : str, value):
+
+        if attribute_name not in self.__fields__:
+            raise AttributeError(f"Impossible to create or change the value of attribute {attribute_name}.")
+        
+        if not isinstance(value, type(getattr(self, attribute_name))):
+            raise TypeError(f"Expected {type(getattr(self, attribute_name)).__name__}. Got {type(value).__name__}")
+        
+        setattr(self, attribute_name, value)
+
+
 
 
 class OptionBaseModel(BaseModel):
+
+    class Config:
+
+        arbitrary_types_allowed = True
+        extra = "forbid"
 
     option_type : str
     strike_date : DateModel
@@ -55,10 +79,10 @@ class OptionBaseModel(BaseModel):
     vol : float = Field(0.15, ge=0)
     time_to_maturity : float = Field(0.25, ge=0)
 
-    class Config:
 
-        arbitrary_types_allowed = True
-
+    # --------------------------------------------------------------------
+    # Common Methods to all Options
+    # --------------------------------------------------------------------
 
     @validator("option_type", pre=True)
     def verify_type(cls, value):
@@ -67,6 +91,22 @@ class OptionBaseModel(BaseModel):
             return value
         else:
             raise ValueError(f"Option type not supported. Admissible types are: {L_OPTIONS}.")
+
+
+    
+    # --------------------------------------------------------------------
+    # Common Methods to all Options
+    # --------------------------------------------------------------------
+
+    def set_parameter(self, attribute_name : str, value):
+
+        if attribute_name not in self.__fields__:
+            raise AttributeError(f"Impossible to create or change the value of attribute {attribute_name}.")
+        
+        if not isinstance(value, type(getattr(self, attribute_name))):
+            raise TypeError(f"Expected {type(getattr(self, attribute_name)).__name__}. Got {type(value).__name__}")
+        
+        setattr(self, attribute_name, value)
 
 
 class Option(OptionBaseModel):

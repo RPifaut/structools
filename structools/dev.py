@@ -24,7 +24,7 @@ WEIGHTS = np.array([0.5, 0.5])
 
 my_underlying = Underlying(
     size=size, 
-    name=name, 
+    name=name,
     WORST=is_worst,
     BEST=is_best,
     COMPO=COMPO,
@@ -32,3 +32,8 @@ my_underlying = Underlying(
 )
 
 print(my_underlying, type(my_underlying), my_underlying.size)
+
+
+my_underlying.set_parameter("size", 10.5)
+# my_underlying.size = 10.5
+print(my_underlying.size)
