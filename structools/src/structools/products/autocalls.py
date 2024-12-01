@@ -59,7 +59,7 @@ class Autocall(BaseModel):
     # General features for all autocallable products
     strike_date : DateModel
     underlying : Union[Underlying, None]
-    matu : float
+    maturity : float
     currency : Union[str, None]
     
     # Recall features
@@ -72,7 +72,7 @@ class Autocall(BaseModel):
     # Coupon features
     coupon : float = Field(ge=0)
     coupon_trigger : float = Field(ge=0)
-    coupon_freq : int = Field(ge=0)
+    coupon_freq : str
     is_memory : bool
 
     # Participation upon recall
@@ -87,6 +87,32 @@ class Autocall(BaseModel):
     put_barrier_observ : str
     kg : float = Field(0.0, ge=0)
 
+
+    # Arrays of data for backtests
+    arr_recall_trigger : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array containing all the values of the recall triggers."
+    )
+
+    arr_recall_dates : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description = "Array containing the dates to be matched for the autocall condition."
+    )
+
+    arr_coupon_trigger : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array containing the values of the coupon trigger."
+    )
+
+    arr_coupon_dates : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array containing the dates to be matched for the coupon condition."
+    )
+
+    arr_put_observ : np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array containing the dates on which we shall observe the barrier for the put"
+    )
 
     # --------------------------------------------------------------------
     # Common Methods to all Autocalls
@@ -108,26 +134,26 @@ class Phoenix(Autocall):
 
     @classmethod
     def from_params(cls, 
-                    strike_date,
-                    underlying,
-                    maturity,
-                    currency, 
-                    start_recall, 
-                    recall_freq,
-                    first_trigger, 
-                    step_down,
-                    coupon,
-                    coupon_trigger,
-                    coupon_freq, 
-                    is_memory,
-                    call_strike,
-                    call_leverage,
-                    call_cap,
-                    put_strike,
-                    put_barrier, 
-                    put_leverage,
-                    put_barrier_observ,
-                    kg):
+                    strike_date : DateModel,
+                    underlying : Underlying,
+                    maturity : float, 
+                    currency : str,
+                    start_recall : int, 
+                    recall_freq : str, 
+                    first_trigger : float,
+                    step_down : float, 
+                    coupon : float,
+                    coupon_trigger : float,
+                    coupon_freq : str,
+                    is_memory : bool,
+                    call_strike : float, 
+                    call_leverage : float,
+                    call_cap : float,
+                    put_strike : float,
+                    put_barrier : float,
+                    put_leverage : float,
+                    put_barrier_observ : str,
+                    kg : float):
         
         return cls(
             strike_date=strike_date, 
@@ -157,24 +183,28 @@ class Athena(Autocall):
 
     @classmethod
     def from_params(cls, 
-                    strike_date,
-                    underlying,
-                    maturity,
-                    currency, 
-                    start_recall, 
-                    recall_freq,
-                    first_trigger, 
-                    step_down,
-                    coupon,
-                    coupon_freq, 
-                    call_strike,
-                    call_leverage,
-                    call_cap,
-                    put_strike,
-                    put_barrier, 
-                    put_leverage,
-                    put_barrier_observ,
-                    kg):
+                    strike_date : DateModel,
+                    underlying : Underlying,
+                    maturity : float,
+                    currency : str,
+                    start_recall : int,
+                    recall_freq : str,
+                    first_trigger : float,
+                    step_down : float, 
+                    coupon : float, 
+                    coupon_freq : str, 
+                    call_strike : float,
+                    call_leverage : float, 
+                    call_cap : float,
+                    put_strike : float,
+                    put_barrier : float, 
+                    put_leverage : float, 
+                    put_barrier_observ : str,
+                    kg : float):
+        
+        """
+        Default function to create an instance of an Athena product.
+        """
         
         return cls(
             strike_date=strike_date, 

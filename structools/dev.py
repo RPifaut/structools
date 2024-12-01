@@ -1,5 +1,5 @@
 from src.structools.products.basic_products import Option, Underlying
-from src.structools.products.autocalls import Phoenix
+from src.structools.products.autocalls import Phoenix, Athena
 from src.structools.tools.date_tools import DateModel
 import numpy as np
 
@@ -31,6 +31,47 @@ my_underlying = Underlying(
     WEIGHTS=WEIGHTS
 )
 
+# Parameters for the Autocall
+strike_date = strike_date
+underlying = my_underlying
+matu = 5
+start_recall = 1
+recall_freq = "A"
+first_trigger = 1
+step_down = 0
+
+coupon = 0.05
+coupon_trigger = first_trigger
+coupon_freq = "A"
+is_memory = True
+
+call_strike = 1
+call_leverage = 0
+call_cap = 999
+
+put_strike = 1
+put_leverage = 0
+put_barrier = 0.7
+put_barrier_obs = "EUROPEAN"
+kg = 0
+
+my_athena = Athena.from_params(
+    strike_date, my_underlying, matu, None, start_recall, recall_freq, first_trigger, step_down, coupon, coupon_freq, call_strike,
+    call_leverage, call_cap, put_strike, put_barrier, put_leverage, put_barrier_obs, kg
+)
+
+my_phoenix = Phoenix.from_params(
+    strike_date, underlying, matu, "EUR", start_recall, recall_freq, first_trigger, step_down, coupon, coupon_trigger, coupon_freq, is_memory, call_strike, call_leverage,
+    call_cap, put_strike, put_barrier, put_leverage, put_barrier_obs, kg
+)
+
+print(my_athena.__dict__)
+
+print(my_phoenix.__dict__)
+
+
+
+# Print results
 print(my_underlying, type(my_underlying), my_underlying.size)
 
 
