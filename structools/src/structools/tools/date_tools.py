@@ -49,7 +49,7 @@ class DateModel(BaseModel):
 
         Returns:
 
-            date(DateModels): DateModel object of type np.datetime64
+            date (DateModels): DateModel object of type np.datetime64
         """
 
         if isinstance(value, np.datetime64):
@@ -63,6 +63,17 @@ class DateModel(BaseModel):
                 raise ValueError(f"Invalid date: {value}")
         else:
             raise TypeError(f"Selected type not supported")
+        
+    
+    def to_str(self) -> str:
+
+        """
+        Function that returns a string representation of the date it represents.
+        """
+
+        return np.datetime_as_string(self.date, 'D')
+
+
 
 
 
