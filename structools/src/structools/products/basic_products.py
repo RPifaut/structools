@@ -1,7 +1,9 @@
 import numpy as np
+import pandas as pd
 from pydantic import BaseModel, Field, validator
 from typing import List
 from src.structools.tools.date_tools import DateModel
+from src.structools.tools.market import Market, L_PRICES
 
 L_OPTIONS = ["CALL", "PUT"]
 
@@ -30,11 +32,15 @@ class Underlying(BaseModel):
         default_factory=lambda: np.array([]),
         description="Array of weights for the underlying."
     )
+    market : Market = None
 
     @validator("WEIGHTS", pre=True)
     def validate_weights(cls, arr_weights):
 
         # Check whether the list is empty of not
+        if not isinstance(arr_weights, np.ndarray):
+            raise TypeError(f"Expected type np.ndarray. Got {type(arr_weights).__name__}.")
+        
         if isinstance(arr_weights, np.ndarray):
             if len(list(arr_weights)) == 0:
                 raise ValueError(f"Weights list cannot be empty.")
@@ -44,6 +50,10 @@ class Underlying(BaseModel):
             raise TypeError(f"Array can only contain integers or floats. Got {arr_weights.dtype}.")
         
         return arr_weights
+    
+    def compute_performance(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
+
+        pass
     
 
     # --------------------------------------------------------------------
@@ -60,6 +70,70 @@ class Underlying(BaseModel):
         
         setattr(self, attribute_name, value)
 
+
+class Basket(Underlying):
+
+    """
+    Class for the representation of a basket of stocks.
+    """
+
+    @classmethod
+    def from_params(cls, 
+                    size,
+                    name,
+                    worst, 
+                    best,
+                    compo,
+                    weights):
+        
+        return cls(size=size,
+                   name=name,
+                   WORST=worst,
+                   BEST=best,
+                   COMPO=compo,
+                   WEIGHTS=weights)
+    
+
+    def compute_performance(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, price : str = 'Close'):
+
+        """
+        Method to compute the performance of a Basket taking into consideration the weighting scheme, worst-of/best-of.
+
+        Parameters:
+
+            start_date(DateModel): Date from which we start loading the data from
+            end_date (DateModel): Date at which we stop loading the data
+            uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
+            price (str): Type of price to be used to compute the Basket's Performance
+
+        """
+
+        # Input validation
+        if end_date.date < start_date.date:
+            raise ValueError("Start date cannot be before end date.")
+
+        if price not in L_PRICES:
+            raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
+        
+        # Load the data
+        market = Market.create_market(self.COMPO, start_date, end_date, uniform)
+
+        # Create a dataframe with the values we are interested in
+        df_track = pd.DataFrame(
+            index = market.data[list(market.data.keys())[0]].index,
+            columns = self.COMPO
+        )
+
+        # Fill in the dataframe
+        for ticker in self.COMPO:
+            df_track[ticker] = market.data[ticker][price]
+
+        # Create a DataFrame for the performance
+        df_perf = df_track.pct_change()
+        df_perf["Weighted"] = df_perf.to_numpy().dot(self.WEIGHTS)
+
+        return df_perf
+        
 
 
 

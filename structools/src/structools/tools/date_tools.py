@@ -23,8 +23,54 @@ DICT_MATCH_FREQ = {
 }
 
 
+
 # ---------------------------------------------------------------------------------------------
 # Functions
+# ---------------------------------------------------------------------------------------------
+
+def find_dates_index(ref_date : np.datetime64, n_obs : int, freq : str, index : np.ndarray):
+
+    """
+    Function that returns an array containing the observation dates given a array of dates.
+
+    Parameters:
+        ref_date: Reference date, starting point for the search
+        n_obs: Number of observation from the strike date.
+        freq: Frequency of the observations.
+        index: Array (pd.Index-like) containing a set of possible observation dates.
+
+    Returns:
+        arr_dates: Array containing the real observation dates.
+    """
+
+
+    # Variables check
+    if freq not in L_FREQ:
+        raise ValueError(f"Frequency not support. Possible values: {L_FREQ}")
+    
+
+    # Find the next theoretical date to find a match in the index
+    if freq == "W":
+        dates_to_match = [ref_date + relativedelta(weeks = 1 + i) for i in range(n_obs)]
+    elif freq == "M":
+        dates_to_match = [ref_date + relativedelta(months = 1 + i) for i in range(n_obs)]
+    elif freq == "Q":
+        dates_to_match = [ref_date + relativedelta(months = 3 * (1 + i)) for i in range(n_obs)]
+    elif freq == "S":
+        dates_to_match = [ref_date + relativedelta(months = 6 * (1 + i)) for i in range(n_obs)]
+    else:
+        dates_to_match = [ref_date + relativedelta(years = 1 + i) for i in range(n_obs)]
+
+    # Find the index
+    matched_indices = np.searchsorted(index, dates_to_match)
+
+    return index[matched_indices]
+
+
+
+
+# ---------------------------------------------------------------------------------------------
+# Classes
 # ---------------------------------------------------------------------------------------------
 
 
