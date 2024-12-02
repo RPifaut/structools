@@ -8,4 +8,4 @@ from src.structools.tools.market import Market
 
 output = Market.create_market(["AAPL", "MSFT"], DateModel(date="2000-01-01"), DateModel(date="2024-01-01"))
 
-print(output)
+print(output.data.keys())
