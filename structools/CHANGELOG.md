@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.7.0 (2024-12-03)
+
+### Features
+
+- Add the return construction for the Baskets - WoF/BoF remains to be done
+  ([`54ae7ce`](https://github.com/RPifaut/structools/commit/54ae7ce107a66f585378fdfb76bbb240e8b37201))
+
+
 ## v0.6.0 (2024-12-02)
 
 ### Features
