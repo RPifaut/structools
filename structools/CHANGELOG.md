@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.6.0 (2024-12-02)
+
+### Features
+
+- Addition of the Backtester class
+  ([`ccd7e23`](https://github.com/RPifaut/structools/commit/ccd7e233dd897faeaa3ebac432da0dee9bd7ab4b))
+
+- Adding the Market class
+  ([`1a1260e`](https://github.com/RPifaut/structools/commit/1a1260e57e0e04fcfdcbd05251e217e343e84c06))
+
+
 ## v0.5.0 (2024-12-01)
 
 ### Features
