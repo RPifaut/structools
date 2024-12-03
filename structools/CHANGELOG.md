@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.8.0 (2024-12-03)
+
+### Features
+
+- Added the track builder for baskets + Review return computation
+  ([`571015b`](https://github.com/RPifaut/structools/commit/571015b0f3f2df891a88329f22d9c18ef08f7cca))
+
+
 ## v0.7.0 (2024-12-03)
 
 ### Features
