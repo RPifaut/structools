@@ -18,9 +18,13 @@ class Underlying(BaseModel):
         frozen = False
 
 
-    size : float = Field(1)
+    size : float = Field(1,
+                         description="Nominal invested on the basket"
+    )
     name : str                      
-    N : int = Field(1)                  
+    N : int = Field(1,
+                    description="In the case of Worst-Of/Best/Of. Number of assets to consider"
+    )                  
     WORST : bool = False                
     BEST : bool = False      
     COMPO : List[str] = Field(
@@ -51,7 +55,7 @@ class Underlying(BaseModel):
         
         return arr_weights
     
-    def compute_performance(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
+    def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
 
         pass
     
@@ -83,6 +87,7 @@ class Basket(Underlying):
                     name,
                     worst, 
                     best,
+                    N,
                     compo,
                     weights):
         
@@ -90,14 +95,15 @@ class Basket(Underlying):
                    name=name,
                    WORST=worst,
                    BEST=best,
+                   N=N,
                    COMPO=compo,
                    WEIGHTS=weights)
     
 
-    def compute_performance(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, price : str = 'Close'):
+    def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, price : str = 'Close') -> pd.DataFrame:
 
         """
-        Method to compute the performance of a Basket taking into consideration the weighting scheme, worst-of/best-of.
+        Method to compute the return of a Basket
 
         Parameters:
 
@@ -105,6 +111,10 @@ class Basket(Underlying):
             end_date (DateModel): Date at which we stop loading the data
             uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
             price (str): Type of price to be used to compute the Basket's Performance
+        
+        Return:
+
+            df_perf (pd.DataFrame): Pandas DataFrame containing the returns of the basket's components
 
         """
 
@@ -119,21 +129,74 @@ class Basket(Underlying):
         market = Market.create_market(self.COMPO, start_date, end_date, uniform)
 
         # Create a dataframe with the values we are interested in
-        df_track = pd.DataFrame(
+        df_perf = pd.DataFrame(
             index = market.data[list(market.data.keys())[0]].index,
             columns = self.COMPO
         )
 
-        # Fill in the dataframe
-        for ticker in self.COMPO:
-            df_track[ticker] = market.data[ticker][price]
-
-        # Create a DataFrame for the performance
-        df_perf = df_track.pct_change()
-        df_perf["Weighted"] = df_perf.to_numpy().dot(self.WEIGHTS)
+        # Create the output DataFrame
+        for ticker in market.data:
+            df_perf[ticker]=market.data[ticker][price].pct_change()
 
         return df_perf
+    
+
+    def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None) -> pd.DataFrame:
+
+        """
+        This method build the track of the basket.
+
+        Parameters:
+
+            start_date (DateModel): Start date of the track
+            end_date (DateModel): End date of the track
+            df_perf (pd.DataFrame): Components performance
         
+        Returns:
+
+            df_track (pd.DataFrame): Pandas DataFrame containing the underlying's track
+
+        """
+
+        # Check whether we have the data to compute the performance
+        if df_perf is None:
+            df_perf = self.compute_return_compo(start_date, end_date)  # Only take Close price
+            print(df_perf)
+        
+
+        # Create output DataFrame
+        df_track = pd.DataFrame(
+            index=df_perf.index,
+            columns=[self.name, "Return"]
+        )
+
+        # Default case of weighted basket
+        df_track[self.name] = df_perf.to_numpy().dot(self.WEIGHTS)
+
+        # Case of N Worst-Of/Best-Of
+        df_perf = df_perf + 1
+        df_perf = df_perf.cumprod()
+        print("Df Perf Data", df_perf)
+        print("-"*20)
+
+        if self.WORST or self.BEST:
+
+            if self.N > len(df_perf.columns):
+                raise ValueError(f"Cannot compute {self.N} extreme performer from a basket containing {len(df_perf.columns)} stocks.")
+            
+            # Sort the rows by ascending order of performance
+            sorted_data = df_perf.to_numpy()
+            arr_weights = np.ones(self.N) * 1/self.N
+            sorted_data = np.sort(sorted_data)
+
+            sorted_data = sorted_data[:, :self.N].dot(arr_weights) if self.WORST else sorted_data[:, -self.N:].dot(arr_weights)
+
+            df_track[self.name] = sorted_data
+            df_track.fillna(1, inplace=True)
+        
+        df_track["Return"] = df_track[self.name].pct_change().fillna(1)
+
+        return df_track
 
 
 
