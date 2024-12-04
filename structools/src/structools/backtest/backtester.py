@@ -125,7 +125,16 @@ class Backtester(BaseModel):
 
             # Determine the coupons that can be paid (exluding the occurrences after the recall for computation efficiency)
             df_coupon = pd.concat([pd.DataFrame(index=arr_coupon_idx), df_temp], axis=1, join='inner')
+            df_coupon = df_coupon.loc[:recall_date]
             arr_coupon_paid = df_coupon[self.product.underlying.name] >= self.product.arr_coupon_trigger
+            arr_coupon_paid = arr_coupon_paid * self.product.coupon
+
+            if self.product.is_memory:
+                arr_all_coupon_paid = np.ones(len(arr_coupon_paid)) * self.product.coupon
+                arr_all_coupon_paid = arr_all_coupon_paid.cumsum()
+                arr_cum_coupon = arr_coupon_paid.cumsum()
+                arr_cum_coupon = np.r_[0, arr_all_coupon_paid[:-1]]
+                arr_coupon_paid = arr_all_coupon_paid - arr_cum_coupon
 
             # Scenario at maturity if no autocall
             if ind_autocall == 0:
@@ -148,3 +157,5 @@ class Backtester(BaseModel):
                         self.product.put_strike - df_temp.iloc[-1, 0], 0
                     ), 1 - self.product.kg
                 )
+
+
