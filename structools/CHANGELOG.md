@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.9.0 (2024-12-05)
+
+### Features
+
+- Progress on autocall backtester + IRR computaion function
+  ([`894e745`](https://github.com/RPifaut/structools/commit/894e745460e40734ac8e82ac5848d5a7bd099aa0))
+
+- Advanced on the Autocall backtester
+  ([`69db4de`](https://github.com/RPifaut/structools/commit/69db4de832777d9e26fb870671f3d7dc040fffdd))
+
+
 ## v0.8.0 (2024-12-03)
 
 ### Features
