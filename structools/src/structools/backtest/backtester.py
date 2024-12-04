@@ -50,6 +50,8 @@ def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
 
     return irr
 
+
+
 class Backtester(BaseModel):
 
     class Config:
@@ -121,7 +123,8 @@ class Backtester(BaseModel):
             index=arr_start,
         )
 
-        arr_recall_periods = np.zeros(n_sim)
+        arr_recall_period = np.zeros(n_sim)
+        arr_autocalled = np.zeros(n_sim)
         arr_irr = np.zeros(n_sim)
 
 
@@ -150,17 +153,19 @@ class Backtester(BaseModel):
             # Determine whether an autocall event has occurred
             arr_has_autocalled = pd.concat([pd.DataFrame(arr_recall_idx), df_temp], axis=1, join='inner')
             arr_has_autocalled = arr_has_autocalled[self.product.underlying.name] >= self.product.arr_recall_trigger
-
+            
             if not any(arr_has_autocalled):
                 # Case no autocall
-                ind_autocall = 0
+                ind_recall = 0
+                
             else:
                 recall_period = np.argmax(arr_has_autocalled)
                 recall_date = df_temp.index[recall_period]
 
             # Determine the coupons that can be paid (exluding the occurrences after the recall for computation efficiency)
             df_coupon = pd.concat([pd.DataFrame(index=arr_coupon_idx), df_temp], axis=1, join='inner')
-            df_coupon = df_coupon.loc[:recall_date]
+            if ind_recall == 1:
+                df_coupon = df_coupon.loc[:recall_date]
             arr_coupon_paid = df_coupon[self.product.underlying.name] >= self.product.arr_coupon_trigger
             arr_coupon_paid = arr_coupon_paid * self.product.coupon
 
@@ -172,7 +177,7 @@ class Backtester(BaseModel):
                 arr_coupon_paid = arr_all_coupon_paid - arr_cum_coupon
 
             # Scenario at maturity if no autocall
-            if ind_autocall == 0:
+            if ind_recall == 0:
 
                 # Check for positive performance
                 call_perf = self.product.call_leverage * np.min(
@@ -196,14 +201,32 @@ class Backtester(BaseModel):
                 payoff_matu = 1 + call_perf - pdi_loss
 
             # Compute IRR
-            # irr = compute_irr(arr_cashflows, arr_dates)
+            s_recall = pd.Series(np.zeros(len(arr_has_autocalled)), index=arr_coupon_idx)
+            s_coupons = pd.Series(np.zeros(len(arr_coupon_paid)), index=arr_coupon_idx)
+
+            if ind_recall:
+                s_recall=s_recall.loc[:recall_date]
+                s_recall[-1] = 1
+                s_coupons=s_coupons.loc[:recall_date]
+            df_temp = pd.concat([s_recall, s_coupons], axis=1)
+            arr_cashflows = df_temp.sum(axis=1)
+            arr_dates = df_temp.index
+            irr = compute_irr(arr_cashflows, arr_dates)
 
             # Store the results
-            arr_has_autocalled[i]=ind_autocall
+            arr_autocalled[i]=ind_recall
+            arr_recall_period[i]=recall_period if ind_recall else 0
             arr_irr[i]=irr
 
-
-
             i+=1
+
+        # Prepare the output DataFrame
+        df_backtest = pd.DataFrame(
+            data=[arr_autocalled, arr_recall_period, arr_irr],
+            index=["Has Autocalled", "Autocall Period", "IRR"],
+            columns = [f"Simulation {i}" for i in range(len(arr_start))]
+        )
+
+        return df_backtest
 
 
