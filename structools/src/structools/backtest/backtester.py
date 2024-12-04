@@ -5,8 +5,9 @@ import datetime as dt
 from typing import List, Union
 from pydantic import BaseModel, Field
 from dateutil.relativedelta import relativedelta
+from scipy.optimize import newton
 
-from src.structools.tools.market import Market
+from src.structools.tools.market import Market, ACT
 from src.structools.tools.date_tools import DateModel, find_dates_index, DICT_MATCH_FREQ
 from src.structools.products.autocalls import Autocall, Phoenix, Athena
 from src.structools.products.basic_products import Underlying
@@ -15,6 +16,39 @@ from src.structools.products.basic_products import Underlying
 
 logging.basicConfig(level=logging.INFO)
 
+# ----------------------------------------------------------------------------------
+# Tool Functions 
+# ----------------------------------------------------------------------------------
+
+def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
+
+    """
+    Function that computes the IRR of an investment. Handle non-linear spacing between payment dates
+
+    Parameters:
+
+        arr_cashflows (np.ndarray): Array containing the various cashflows
+        arr_dates (np.ndarray): Array containing the associated payment dates
+
+    Returns:
+
+        irr (float): IRR of the investment
+    """
+
+    arr_time_since_incept = np.array(
+        [(date - arr_dates[0]) / ACT for date in arr_dates]
+    )
+    # Tool function that computes the NPV of the investment
+    def npv(irr):
+
+        return sum(
+            cf / (1+irr) ** t for cf, t in zip(arr_cashflows, arr_time_since_incept)
+        ) 
+    
+    # IRR Computation, initial guess of 7% per annum
+    irr = newton(npv, x0=0.07)
+
+    return irr
 
 class Backtester(BaseModel):
 
@@ -91,7 +125,8 @@ class Backtester(BaseModel):
         arr_irr = np.zeros(n_sim)
 
 
-        # Loop on the 
+        # Loop on the dates
+        i = 0
         for date_init in arr_start:
 
             # Generate the data and temporary variables
@@ -150,12 +185,25 @@ class Backtester(BaseModel):
                 if self.product.put_barrier_observ == "EUROPEAN":
                     activated = df_perf.iloc[-1, 0] <= self.product.put_barrier
                 else:
-                    activate = any(df_perf[self.product.underlying.name] <= self.product.put_barrier)
+                    activated = any(df_perf[self.product.underlying.name] <= self.product.put_barrier)
 
                 pdi_loss = np.min(
                     activated * self.product.put_leverage * np.max(
                         self.product.put_strike - df_temp.iloc[-1, 0], 0
                     ), 1 - self.product.kg
                 )
+
+                payoff_matu = 1 + call_perf - pdi_loss
+
+            # Compute IRR
+            # irr = compute_irr(arr_cashflows, arr_dates)
+
+            # Store the results
+            arr_has_autocalled[i]=ind_autocall
+            arr_irr[i]=irr
+
+
+
+            i+=1
 
 
