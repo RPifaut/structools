@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.10.0 (2024-12-06)
+
+### Bug Fixes
+
+- Adding loggers
+  ([`1a918c9`](https://github.com/RPifaut/structools/commit/1a918c96793e9ba23af419dbd0b98bda352736a4))
+
+### Features
+
+- To be tester: finished autocall backtester
+  ([`fe38f5a`](https://github.com/RPifaut/structools/commit/fe38f5a2e236e39f97c30ee7c0383511e098d0f1))
+
+- Adding unsaved lines
+  ([`18d92ad`](https://github.com/RPifaut/structools/commit/18d92ad9bb273ef435cb01bed654c47643237586))
+
+
 ## v0.9.0 (2024-12-05)
 
 ### Features
