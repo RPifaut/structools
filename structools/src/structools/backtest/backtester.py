@@ -46,7 +46,11 @@ def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
         ) 
     
     # IRR Computation, initial guess of 7% per annum
-    irr = newton(npv, x0=0.07)
+    try:
+        irr = newton(npv, x0=0.07)
+    except:
+        irr = np.nan
+        logging.info("IRR computation failed.")
 
     return irr
 
@@ -129,6 +133,7 @@ class Backtester(BaseModel):
 
 
         # Loop on the dates
+        logging.info(f"Backtesting from {START} to {END} for a total of {n_sim} trajectories.")
         i = 0
         for date_init in arr_start:
 
@@ -157,6 +162,7 @@ class Backtester(BaseModel):
             if not any(arr_has_autocalled):
                 # Case no autocall
                 ind_recall = 0
+                logging.info(f"Trajectory {i}, started on {date_init} did not autocall.")
                 
             else:
                 recall_period = np.argmax(arr_has_autocalled)
@@ -192,6 +198,9 @@ class Backtester(BaseModel):
                 else:
                     activated = any(df_perf[self.product.underlying.name] <= self.product.put_barrier)
 
+                if activated:
+                    logging.INFO(f"Trajectory {i}, started on {date_init}, trigger a barrier event.")
+
                 pdi_loss = np.min(
                     activated * self.product.put_leverage * np.max(
                         self.product.put_strike - df_temp.iloc[-1, 0], 0
@@ -199,6 +208,7 @@ class Backtester(BaseModel):
                 )
 
                 payoff_matu = 1 + call_perf - pdi_loss
+                arr_coupon_paid[-1] += payoff_matu
 
             # Compute IRR
             s_recall = pd.Series(np.zeros(len(arr_has_autocalled)), index=arr_coupon_idx)
@@ -221,6 +231,7 @@ class Backtester(BaseModel):
             i+=1
 
         # Prepare the output DataFrame
+        logging.info("Backtest completed!")
         df_backtest = pd.DataFrame(
             data=[arr_autocalled, arr_recall_period, arr_irr],
             index=["Has Autocalled", "Autocall Period", "IRR"],

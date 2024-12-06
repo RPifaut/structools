@@ -1,9 +1,12 @@
 import numpy as np
 import pandas as pd
+import logging
 from pydantic import BaseModel, Field, validator
 from typing import List
 from src.structools.tools.date_tools import DateModel
 from src.structools.tools.market import Market, L_PRICES
+
+logging.basicConfig(level=logging.INFO)
 
 L_OPTIONS = ["CALL", "PUT"]
 
@@ -56,6 +59,10 @@ class Underlying(BaseModel):
         return arr_weights
     
     def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
+
+        pass
+
+    def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None):
 
         pass
     
@@ -138,6 +145,8 @@ class Basket(Underlying):
         for ticker in market.data:
             df_perf[ticker]=market.data[ticker][price].pct_change()
 
+        logging.info("Return computation successfully completed.")
+
         return df_perf
     
 
@@ -161,7 +170,6 @@ class Basket(Underlying):
         # Check whether we have the data to compute the performance
         if df_perf is None:
             df_perf = self.compute_return_compo(start_date, end_date)  # Only take Close price
-            print(df_perf)
         
 
         # Create output DataFrame
@@ -176,8 +184,6 @@ class Basket(Underlying):
         # Case of N Worst-Of/Best-Of
         df_perf = df_perf + 1
         df_perf = df_perf.cumprod()
-        print("Df Perf Data", df_perf)
-        print("-"*20)
 
         if self.WORST or self.BEST:
 
@@ -195,6 +201,8 @@ class Basket(Underlying):
             df_track.fillna(1, inplace=True)
         
         df_track["Return"] = df_track[self.name].pct_change().fillna(1)
+
+        logging.info(f"Track successfully built for {self.name}.")
 
         return df_track
 

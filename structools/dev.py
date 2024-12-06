@@ -11,10 +11,11 @@ my_basket = Basket.from_params(
     N=1,
     name="EQW Basket",
     worst=False,
-    best=True,
-    compo=["AAPL", "MSFT", "AMZN"],
-    weights=np.array([0.33, 0.33, 0.33])
+    best=False,
+    compo=["AAPL"],
+    weights=np.array([1])
 )
+
 start=DateModel(date="2000-01-01")
 end=DateModel(date="2010-01-01")
 market = Market.create_market(my_basket.COMPO, start, end)

@@ -9,6 +9,7 @@ from pybacktestchain.data_module import DataModule, get_stocks_data
 logging.basicConfig(level=logging.INFO)
 
 L_PRICES = ["Open", "High", "Low", "Close", "Adj. Close"]
+ACT = 365
 
 
 
@@ -83,6 +84,7 @@ class Market(BaseModel):
         dict_data = {}
 
         # Load the market data
+        logging.info("Start loading market data.")
         df_data = load_stocks_data(tickers, start_date, end_date)
         logging.info("Data loading completed.")
         
@@ -98,6 +100,7 @@ class Market(BaseModel):
         if uniform:
             
             # Create Uniform index
+            logging.info("Homogenising the data with respect to the dates.")
             my_index = df_data[df_data["ticker"]==tickers[0]].index
             for ticker in tickers:
                 my_index = np.intersect1d(my_index, dict_data[ticker].index)
@@ -106,5 +109,7 @@ class Market(BaseModel):
             my_index = pd.DataFrame(index = my_index)
             for ticker in tickers:
                 dict_data[ticker] = pd.concat([my_index, dict_data[ticker]], axis=1, join='inner')
+
+        logging.info("Market sucessfully created.")
 
         return cls(data = dict_data)
