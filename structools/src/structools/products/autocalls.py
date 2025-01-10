@@ -1,8 +1,8 @@
 import numpy as np
 import pandas as pd
-from pydantic import BaseModel, validator, Field
+from pydantic import BaseModel, field_validator, Field
 from datetime import date
-from typing import Union
+from typing import Union, Literal
 
 from src.structools.tools.date_tools import DateModel
 from src.structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, find_dates_index
@@ -11,6 +11,10 @@ from src.structools.products.basic_products import Underlying
 
 # List with the possible type of observation for the put
 L_OBS_PUT = ["European", "American"]
+
+# Default objects
+
+default_underlying  = Underlying()
 
 
 # ------------------------------------------------------------------------------------
@@ -58,14 +62,14 @@ class Autocall(BaseModel):
 
 
     # General features for all autocallable products
-    strike_date : DateModel
-    underlying : Union[Underlying, None]
-    maturity : int
-    currency : Union[str, None]
+    strike_date : DateModel = Field (DateModel(date="2001-10-22"))
+    underlying : Underlying = Field(default_underlying)
+    maturity : int = Field(10, ge=1),
+    currency : str = Field("EUR")
     
     # Recall features
     start_recall : int = Field(1, gt=0)
-    recall_freq : str 
+    recall_freq : str = "A"
     first_trigger : float = Field(1.0, ge=1)
     step_down : float = Field(0.0, ge=0)
 
@@ -74,8 +78,8 @@ class Autocall(BaseModel):
     coupon : float = Field(ge=0)
     coupon_trigger : float = Field(ge=0)
     start_coupon : int = Field(1, ge=0)
-    coupon_freq : str
-    is_memory : bool
+    coupon_freq : str = "A"
+    is_memory : bool = False
 
     # Participation upon recall
     call_strike : float = Field(1.0, ge=0)
@@ -86,7 +90,7 @@ class Autocall(BaseModel):
     put_strike : float = Field(1.0, ge=0)
     put_barrier : float = Field(0.7, ge=0)
     put_leverage : float = Field(0.0, ge=0)
-    put_barrier_observ : str
+    put_barrier_observ : str = "EUROPEAN"
     kg : float = Field(0.0, ge=0)
 
 
@@ -116,6 +120,16 @@ class Autocall(BaseModel):
         description="Array containing the dates on which we shall observe the barrier for the put"
     )
 
+    # Data Validators for the frequency types
+    # @field_validator("recall_freq", pre=True)
+    # def recall_freq_validation(cls, value):
+
+    #     if value not in L_FREQ:
+    #         raise ValueError(f"Frequency {value} not supported. Only accepts: {L_FREQ}.")
+
+    #     return value
+
+
     # --------------------------------------------------------------------
     # Common Methods to all Autocalls
     # --------------------------------------------------------------------
@@ -143,6 +157,10 @@ class Autocall(BaseModel):
 
 
 class Phoenix(Autocall):
+
+    """
+    Default class method to create an instance of an Athena product.
+    """
 
     @classmethod
     def from_params(cls, 
@@ -228,7 +246,7 @@ class Athena(Autocall):
                     kg : float):
         
         """
-        Default function to create an instance of an Athena product.
+        Default class method to create an instance of an Athena product.
         """
 
         # In the case of an Athena structure, coupons are paid upon redemption. Therefore coupon and recall triggers are the same

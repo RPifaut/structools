@@ -24,22 +24,22 @@ class Underlying(BaseModel):
     size : float = Field(1,
                          description="Nominal invested on the basket"
     )
-    name : str                      
+    name : str = Field(default="AAPL")            
     N : int = Field(1,
                     description="In the case of Worst-Of/Best/Of. Number of assets to consider"
     )                  
-    WORST : bool = False                
-    BEST : bool = False      
+    WORST : bool = Field(False)                
+    BEST : bool = Field(False)      
     COMPO : List[str] = Field(
-        default_factory=list,
+        default=["AAPL"],
         description="List of components in the Underlying.",
         min_items=1
     ) 
     WEIGHTS : np.ndarray = Field(
-        default_factory=lambda: np.array([]),
+        default=np.array([1]),
         description="Array of weights for the underlying."
     )
-    market : Market = None
+    market : Market = Field(None)
 
     @validator("WEIGHTS", pre=True)
     def validate_weights(cls, arr_weights):
@@ -57,7 +57,7 @@ class Underlying(BaseModel):
             raise TypeError(f"Array can only contain integers or floats. Got {arr_weights.dtype}.")
         
         return arr_weights
-    
+        
     def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
 
         pass
@@ -143,7 +143,7 @@ class Basket(Underlying):
 
         # Create the output DataFrame
         for ticker in market.data:
-            df_perf[ticker]=market.data[ticker][price].pct_change()
+            df_perf[ticker]=market.data[ticker][price].pct_change().fillna(1)
 
         logging.info("Return computation successfully completed.")
 
@@ -180,6 +180,7 @@ class Basket(Underlying):
 
         # Default case of weighted basket
         df_track[self.name] = df_perf.to_numpy().dot(self.WEIGHTS)
+        df_track[self.name] = (df_track[self.name] + 1).cumprod()
 
         # Case of N Worst-Of/Best-Of
         df_perf = df_perf + 1
@@ -200,7 +201,7 @@ class Basket(Underlying):
             df_track[self.name] = sorted_data
             df_track.fillna(1, inplace=True)
         
-        df_track["Return"] = df_track[self.name].pct_change().fillna(1)
+        df_track["Return"] = df_track[self.name].pct_change()
 
         logging.info(f"Track successfully built for {self.name}.")
 
