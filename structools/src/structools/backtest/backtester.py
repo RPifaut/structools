@@ -55,6 +55,30 @@ def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
     return irr
 
 
+def get_observations_values(start_date : DateModel, n_obs : int, freq : str, df_underlying : pd.DataFrame) -> np.ndarray:
+
+    """
+    Function retrieving the values of the underlying's values on observations dates.
+
+    Parameters:
+
+        - start_date (DateModel): Date of the launch of the product.
+        - n_obs (int): Number of observations.
+        - freq (str): Observation Frequency.
+        - df_underlying (pd.DataFrame): DataFrame containing the Underlying's performance.
+
+    Returns:
+
+        - arr_obs_perf (np.ndarray): Matrix containing the underlying's values on the observation date
+
+    """
+
+    idx_dates = find_dates_index(start_date.date, n_obs, freq, df_underlying.index)
+    arr_obs_perf = df_underlying.values[[idx_dates]]
+    
+    return arr_obs_perf
+
+
 
 class Backtester(BaseModel):
 
@@ -97,6 +121,10 @@ class Backtester(BaseModel):
     # Backtester for the autocalls
     # ---------------------------------------------------------------------------------------
 
+    def mono_path_backtest(self, product : Autocall, arr_):
+
+        return None
+    
     def backtest_autocall(self, price : str = 'Close') -> pd.DataFrame:
 
         """
