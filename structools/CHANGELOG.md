@@ -1,6 +1,19 @@
 # CHANGELOG
 
 
+## v0.11.0 (2025-01-10)
+
+### Bug Fixes
+
+- Test for version update after GHTK change
+  ([`2ed006a`](https://github.com/RPifaut/structools/commit/2ed006ac491f25a5e8d107054884123d6bee9bed))
+
+### Features
+
+- Fixed type validation + basket track construction
+  ([`d2e025e`](https://github.com/RPifaut/structools/commit/d2e025e9a24c209cdbc4d6971a9d1e71b54d8d01))
+
+
 ## v0.10.0 (2024-12-06)
 
 ### Bug Fixes
