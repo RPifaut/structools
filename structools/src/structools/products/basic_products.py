@@ -3,7 +3,7 @@ import pandas as pd
 import plotly.graph_objects as go
 
 import logging
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List
 from src.structools.tools.date_tools import DateModel
 from src.structools.tools.market import Market, L_PRICES
@@ -43,7 +43,9 @@ class Underlying(BaseModel):
     )
     market : Market = Field(None)
 
-    @validator("WEIGHTS", pre=True)
+
+    # Field validators
+    @field_validator("WEIGHTS", mode="before")
     def validate_weights(cls, arr_weights):
 
         # Check whether the list is empty of not
@@ -58,8 +60,35 @@ class Underlying(BaseModel):
         if not np.issubdtype(arr_weights.dtype, np.number):
             raise TypeError(f"Array can only contain integers or floats. Got {arr_weights.dtype}.")
         
-        return arr_weights
+        # Check that the weights sum up to 1
+        if np.round(sum(arr_weights), 5) != 1:
+            raise ValueError(f"The weights of the custom basket must sum up to 1. Here, the sum equals {sum(arr_weights)}.")
         
+        logging.info("Weights selection validated.")
+        
+        return arr_weights
+    
+
+    # Model validation
+    @model_validator(mode="after")
+    def validate_selection(self):
+
+        # Check Worst-Of/Best-Of Compatibility
+        if self.WORST and self.BEST:
+            raise ValueError("Incompatible selection: the basket cannot be both Worst and Best-Of.")
+
+        # Check the compatilibility of the number of components to be considered for the Worst/best of computation
+        if self.N > len(self.COMPO):
+            raise ValueError(f"Incompatible selection: cannot have more worst/best of  {self.N} elements than basket underlyings {len(self.COMPO)}.")   
+        
+        # Check compatibility between weights and number of assets
+        if len(self.COMPO) != len(self.WEIGHTS):
+            raise ValueError(f"Lengths of weights and composition do not match. Got {len(self.COMPO)} components for {len(self.WEIGHTS)} weights.")
+
+        logging.info("Coherent Selection of the basket components. Basket successfully created!")
+
+        return self
+
     def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
 
         pass
@@ -99,6 +128,8 @@ class Basket(Underlying):
                     N,
                     compo,
                     weights):
+
+        logging.info("Build the basket...")
         
         return cls(size=size,
                    name=name,
@@ -291,7 +322,7 @@ class OptionBaseModel(BaseModel):
     # Common Methods to all Options
     # --------------------------------------------------------------------
 
-    @validator("option_type", pre=True)
+    @field_validator("option_type", mode="before")
     def verify_type(cls, value):
 
         if value.upper() in L_OPTIONS:

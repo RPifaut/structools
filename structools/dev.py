@@ -19,9 +19,9 @@ arr_weights = np.array([0.6, 0.3, 0.1])
 
 my_basket = Basket.from_params(
     size = 1_000,
-    N=4,
+    N=3,
     name="EQW Basket",
-    worst=True,
+    worst=False,
     best=False,
     compo=l_compo,
     weights=arr_weights
@@ -31,14 +31,14 @@ my_basket = Basket.from_params(
 # print(test_underlying.COMPO)
 # print(test_underlying)
 
-start=DateModel(date="2000-01-01")
-end=DateModel(date="2020-01-04")
+# start=DateModel(date="2000-01-01")
+# end=DateModel(date="2020-01-04")
 # market = Market.create_market(my_basket.COMPO, start, end)
 # print(market.data["^FCHI"])
-df_perf = my_basket.compute_return_compo(start, end)
+# df_perf = my_basket.compute_return_compo(start, end)
 # print(df)
-df = my_basket.build_track(start, end)
+# df = my_basket.build_track(start, end)
 # df.to_excel("Test dataframe.xlsx")
-fig = my_basket.plot_track(start, end, df_perf, df, True)
-print(type(fig).__name__)
-fig.show()
+# fig = my_basket.plot_track(start, end, df_perf, df, True)
+# print(type(fig).__name__)
+# fig.show()
