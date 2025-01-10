@@ -22,7 +22,6 @@ class Underlying(BaseModel):
         extra = "forbid"
         frozen = False
 
-
     size : float = Field(1,
                          description="Nominal invested on the basket"
     )
@@ -88,6 +87,7 @@ class Underlying(BaseModel):
         logging.info("Coherent Selection of the basket components. Basket successfully created!")
 
         return self
+
 
     def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
 

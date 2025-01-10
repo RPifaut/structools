@@ -8,6 +8,8 @@ from src.structools.tools.date_tools import DateModel
 from src.structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, find_dates_index
 from src.structools.products.basic_products import Underlying
 
+import logging
+logging.basicConfig(level=logging.INFO)
 
 # List with the possible type of observation for the put
 L_OBS_PUT = ["European", "American"]
@@ -64,7 +66,7 @@ class Autocall(BaseModel):
     # General features for all autocallable products
     strike_date : DateModel = Field (DateModel(date="2001-10-22"))
     underlying : Underlying = Field(default_underlying)
-    maturity : int = Field(10, ge=1),
+    maturity : int = Field(10, ge=1)
     currency : str = Field("EUR")
     
     # Recall features
@@ -75,8 +77,8 @@ class Autocall(BaseModel):
 
 
     # Coupon features
-    coupon : float = Field(ge=0)
-    coupon_trigger : float = Field(ge=0)
+    coupon : float = Field(0.05, ge=0)
+    coupon_trigger : float = Field(0.8, ge=0)
     start_coupon : int = Field(1, ge=0)
     coupon_freq : str = "A"
     is_memory : bool = False
@@ -121,13 +123,13 @@ class Autocall(BaseModel):
     )
 
     # Data Validators for the frequency types
-    # @field_validator("recall_freq", pre=True)
-    # def recall_freq_validation(cls, value):
+    @field_validator("recall_freq", mode="before")
+    def recall_freq_validation(cls, value):
 
-    #     if value not in L_FREQ:
-    #         raise ValueError(f"Frequency {value} not supported. Only accepts: {L_FREQ}.")
+        if value not in L_FREQ:
+            raise ValueError(f"Frequency {value} not supported. Only accepts: {L_FREQ}.")
 
-    #     return value
+        return value
 
 
     # --------------------------------------------------------------------
@@ -162,29 +164,29 @@ class Phoenix(Autocall):
     Default class method to create an instance of an Athena product.
     """
 
-    @classmethod
+    @classmethod                # Allows to instantiate an object using default values when missing arguments
     def from_params(cls, 
-                    strike_date : DateModel,
-                    underlying : Underlying,
-                    maturity : int, 
-                    currency : str,
-                    start_recall : int, 
-                    recall_freq : str, 
-                    first_trigger : float,
-                    step_down : float, 
-                    coupon : float,
-                    coupon_trigger : float,
-                    start_coupon : int, 
-                    coupon_freq : str,
-                    is_memory : bool,
-                    call_strike : float, 
-                    call_leverage : float,
-                    call_cap : float,
-                    put_strike : float,
-                    put_barrier : float,
-                    put_leverage : float,
-                    put_barrier_observ : str,
-                    kg : float):
+                strike_date: DateModel = Autocall.model_fields['strike_date'].default,
+                underlying: Underlying = Autocall.model_fields['underlying'].default,
+                maturity: int = Autocall.model_fields['maturity'].default, 
+                currency: str = Autocall.model_fields['currency'].default,
+                start_recall: int = Autocall.model_fields['start_recall'].default, 
+                recall_freq: str = Autocall.model_fields['recall_freq'].default, 
+                first_trigger: float = Autocall.model_fields['first_trigger'].default,
+                step_down: float = Autocall.model_fields['step_down'].default, 
+                coupon: float = Autocall.model_fields['coupon'].default,
+                coupon_trigger: float = Autocall.model_fields['coupon_trigger'].default,
+                start_coupon: int = Autocall.model_fields['start_coupon'].default, 
+                coupon_freq: str = Autocall.model_fields['coupon_freq'].default,
+                is_memory: bool = Autocall.model_fields['is_memory'].default,
+                call_strike: float = Autocall.model_fields['call_strike'].default, 
+                call_leverage: float = Autocall.model_fields['call_leverage'].default,
+                call_cap: float = Autocall.model_fields['call_cap'].default,
+                put_strike: float = Autocall.model_fields['put_strike'].default,
+                put_barrier: float = Autocall.model_fields['put_barrier'].default,
+                put_leverage: float = Autocall.model_fields['put_leverage'].default,
+                put_barrier_observ: str = Autocall.model_fields['put_barrier_observ'].default,
+                kg: float = Autocall.model_fields['kg'].default):
         
         # Definition of the triggers arrays
         n_obs_recall = DICT_MATCH_FREQ[recall_freq]
@@ -223,27 +225,27 @@ class Phoenix(Autocall):
 
 class Athena(Autocall):
 
-    @classmethod
-    def from_params(cls, 
-                    strike_date : DateModel,
-                    underlying : Underlying,
-                    maturity : float,
-                    currency : str,
-                    start_recall : int,
-                    recall_freq : str,
-                    first_trigger : float,
-                    step_down : float, 
-                    coupon : float, 
-                    coupon_freq : str, 
-                    start_coupon : int,
-                    call_strike : float,
-                    call_leverage : float, 
-                    call_cap : float,
-                    put_strike : float,
-                    put_barrier : float, 
-                    put_leverage : float, 
-                    put_barrier_observ : str,
-                    kg : float):
+    @classmethod            # Allows to instantiate an object using default values when missing arguments
+    def from_params(cls,        
+                strike_date: DateModel = Autocall.model_fields['strike_date'].default,
+                underlying: Underlying = Autocall.model_fields['underlying'].default,
+                maturity: float = Autocall.model_fields['maturity'].default,
+                currency: str = Autocall.model_fields['currency'].default,
+                start_recall: int = Autocall.model_fields['start_recall'].default,
+                recall_freq: str = Autocall.model_fields['recall_freq'].default,
+                first_trigger: float = Autocall.model_fields['first_trigger'].default,
+                step_down: float = Autocall.model_fields['step_down'].default,
+                coupon: float = Autocall.model_fields['coupon'].default,
+                coupon_freq: str = Autocall.model_fields['coupon_freq'].default,
+                start_coupon: int = Autocall.model_fields['start_coupon'].default,
+                call_strike: float = Autocall.model_fields['call_strike'].default,
+                call_leverage: float = Autocall.model_fields['call_leverage'].default,
+                call_cap: float = Autocall.model_fields['call_cap'].default,
+                put_strike: float = Autocall.model_fields['put_strike'].default,
+                put_barrier: float = Autocall.model_fields['put_barrier'].default,
+                put_leverage: float = Autocall.model_fields['put_leverage'].default,
+                put_barrier_observ: str = Autocall.model_fields['put_barrier_observ'].default,
+                kg: float = Autocall.model_fields['kg'].default):
         
         """
         Default class method to create an instance of an Athena product.

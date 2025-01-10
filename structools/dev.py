@@ -17,15 +17,20 @@ N = len(l_compo)
 # arr_weights = np.ones(N) * 1/N
 arr_weights = np.array([0.6, 0.3, 0.1])
 
-my_basket = Basket.from_params(
-    size = 1_000,
-    N=3,
-    name="EQW Basket",
-    worst=False,
-    best=False,
-    compo=l_compo,
-    weights=arr_weights
-)
+
+my_phoenix = Athena.from_params(start_recall = 4, step_down=0.02, maturity=10, recall_freq="S")
+print(my_phoenix.arr_recall_trigger)
+
+
+# my_basket = Basket.from_params(
+#     size = 1_000,
+#     N=3,
+#     name="EQW Basket",
+#     worst=False,
+#     best=False,
+#     compo=l_compo,
+#     weights=arr_weights
+# )
 
 # test_underlying = Underlying()
 # print(test_underlying.COMPO)
