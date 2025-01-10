@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.12.2 (2025-01-10)
+
+### Bug Fixes
+
+- Improving Model Selection for the basket
+  ([`233740d`](https://github.com/RPifaut/structools/commit/233740dee6714e8edfc5bbaf49746045b7b3661b))
+
+
 ## v0.12.1 (2025-01-10)
 
 ### Bug Fixes
