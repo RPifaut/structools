@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.12.3 (2025-01-10)
+
+### Bug Fixes
+
+- Allowing default construction of Autocall Objects + Data validation improvement for Autocall
+  ([`21b5a85`](https://github.com/RPifaut/structools/commit/21b5a8595af1422cfb77e0f14d862c82e94e7519))
+
+
 ## v0.12.2 (2025-01-10)
 
 ### Bug Fixes
