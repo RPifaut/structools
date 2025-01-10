@@ -160,17 +160,3 @@ def find_dates_index(ref_date : np.datetime64, n_obs : int, freq : str, index : 
     matched_indices = np.searchsorted(index, dates_to_match)
 
     return index[matched_indices]
-
-
-if __name__ == '__main__':
-
-    input_data = [
-    {"date": "2023-11-27"},
-    {"date": datetime(2023, 11, 27)},
-    {"date": date(2023, 11, 27)},
-    {"date": np.datetime64("2023-11-27")},
-    ]
-
-    for data in input_data:
-        validated = DateModel(**data)
-        print(validated.date, type(validated.date), type(validated))
