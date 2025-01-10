@@ -242,16 +242,6 @@ class Basket(Underlying):
         # Create the figure
         fig = go.Figure()
 
-        # Plotting the track of the basket
-        fig.add_trace(
-            go.Scatter(
-                x=df_track.index, 
-                y=df_track[self.name],
-                mode='lines',
-                name=self.name
-            )
-        )
-
         # Plot the components if required
         if with_compo:
             df_perf = (df_perf + 1).cumprod()
@@ -264,6 +254,17 @@ class Basket(Underlying):
                         name=elem
                     )
                 )
+
+        # Plotting the track of the basket
+        fig.add_trace(
+            go.Scatter(
+                x=df_track.index, 
+                y=df_track[self.name],
+                mode='lines',
+                name=self.name,
+                line=dict(width=2, color='black')
+            )
+        )
 
         return fig
 
