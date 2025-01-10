@@ -80,7 +80,6 @@ class Autocall(BaseModel):
     coupon : float = Field(0.05, ge=0)
     coupon_trigger : float = Field(0.8, ge=0)
     start_coupon : int = Field(1, ge=0)
-    coupon_freq : str = "A"
     is_memory : bool = False
 
     # Participation upon recall
@@ -177,7 +176,6 @@ class Phoenix(Autocall):
                 coupon: float = Autocall.model_fields['coupon'].default,
                 coupon_trigger: float = Autocall.model_fields['coupon_trigger'].default,
                 start_coupon: int = Autocall.model_fields['start_coupon'].default, 
-                coupon_freq: str = Autocall.model_fields['coupon_freq'].default,
                 is_memory: bool = Autocall.model_fields['is_memory'].default,
                 call_strike: float = Autocall.model_fields['call_strike'].default, 
                 call_leverage: float = Autocall.model_fields['call_leverage'].default,
@@ -190,9 +188,8 @@ class Phoenix(Autocall):
         
         # Definition of the triggers arrays
         n_obs_recall = DICT_MATCH_FREQ[recall_freq]
-        n_obs_coupon = DICT_MATCH_FREQ[coupon_freq]
         arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
-        arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_coupon * maturity)
+        arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_recall * maturity)
 
 
         return cls(
@@ -207,7 +204,6 @@ class Phoenix(Autocall):
             coupon=coupon, 
             coupon_trigger=coupon_trigger, 
             start_coupon=start_coupon,
-            coupon_freq=coupon_freq,
             is_memory=is_memory,
             call_strike=call_strike,
             call_leverage=call_leverage,
