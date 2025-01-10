@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.12.0 (2025-01-10)
+
+### Features
+
+- Added: Plotting the basket and components performance
+  ([`b01cabd`](https://github.com/RPifaut/structools/commit/b01cabd221ac01bc47f1760b17251c4fd235b0bb))
+
+
 ## v0.11.1 (2025-01-10)
 
 ### Bug Fixes
