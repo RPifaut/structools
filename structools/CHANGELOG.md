@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.12.4 (2025-01-10)
+
+### Bug Fixes
+
+- Removing unnecessary lines of code
+  ([`2a02b9b`](https://github.com/RPifaut/structools/commit/2a02b9bf0f00106fa80772ce72f19e323cb6d20a))
+
+
 ## v0.12.3 (2025-01-10)
 
 ### Bug Fixes
