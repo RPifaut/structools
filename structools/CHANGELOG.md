@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.12.1 (2025-01-10)
+
+### Bug Fixes
+
+- Emphasing the basket performance on the plots
+  ([`2307d94`](https://github.com/RPifaut/structools/commit/2307d94b46dc520640ae6c38177e66e9d59f278e))
+
+
 ## v0.12.0 (2025-01-10)
 
 ### Features
