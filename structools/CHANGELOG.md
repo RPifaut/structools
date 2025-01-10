@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.13.0 (2025-01-10)
+
+### Features
+
+- Indexing the coupon payment dates on the recall dates
+  ([`a0ee999`](https://github.com/RPifaut/structools/commit/a0ee999209d8bd7a248e2f99b12cf5aed314a7de))
+
+
 ## v0.12.4 (2025-01-10)
 
 ### Bug Fixes
