@@ -55,14 +55,14 @@ def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
     return irr
 
 
-def get_observations_values(start_date : DateModel, n_obs : int, freq : str, df_underlying : pd.DataFrame) -> np.ndarray:
+def get_observations_values(start_date : np.datetime64, n_obs : int, freq : str, df_underlying : pd.DataFrame) -> np.ndarray:
 
     """
     Function retrieving the values of the underlying's values on observations dates.
 
     Parameters:
 
-        - start_date (DateModel): Date of the launch of the product.
+        - start_date (np.datetime64): Date of the launch of the product.
         - n_obs (int): Number of observations.
         - freq (str): Observation Frequency.
         - df_underlying (pd.DataFrame): DataFrame containing the Underlying's performance.
@@ -73,11 +73,39 @@ def get_observations_values(start_date : DateModel, n_obs : int, freq : str, df_
 
     """
 
-    idx_dates = find_dates_index(start_date.date, n_obs, freq, df_underlying.index)
-    arr_obs_perf = df_underlying.values[[idx_dates]]
+    idx_dates = find_dates_index(start_date, n_obs, freq, df_underlying.index)
+    arr_obs_perf = np.r_[df_underlying[start_date], df_underlying.values[idx_dates]]
+    arr_obs_perf = arr_obs_perf / arr_obs_perf[0]
     
     return arr_obs_perf
 
+
+def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, df_underlying : pd.DataFrame) -> np.ndarray:
+
+    """
+    Function retrieving the values of the underlying's values on observations dates.
+
+    Parameters:
+
+        - arr_start_date (np.ndarray): Array of dates of the launch of the product.
+        - n_obs (int): Number of observations.
+        - freq (str): Observation Frequency.
+        - df_underlying (pd.DataFrame): DataFrame containing the Underlying's performance.
+
+    Returns:
+
+        - arr_obs_perf (np.ndarray): Matrix containing the underlying's values on the observation date
+
+    """
+
+    # Matrix containing the results
+    mat_obs_perf = np.zeros((len(arr_start_dates), n_obs+1))
+
+    # Retrieving the arrays of values
+    for i in range(len(arr_start_dates)):
+        mat_obs_perf[i, :] = get_observations_values(arr_start_dates[i], n_obs, freq, df_underlying)
+
+    return mat_obs_perf
 
 
 class Backtester(BaseModel):

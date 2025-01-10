@@ -36,15 +36,16 @@ def load_stocks_data(tickers : List[str], start_date : DateModel, end_date : Dat
 
     # Get the data from the original function
     df_output = get_stocks_data(tickers, start_date.to_str(), end_date.to_str()).set_index("Date")
-
-    # Convert the index types so it is compatible with the rest of the package
-    df_output.index = pd.DatetimeIndex(
+    df_output.index = pd.Index(
         list(
             map(
-                lambda date: DateModel(date=date).date, df_output.index.values
+                lambda d: DateModel(date=d).date,
+                df_output.index.values
             )
         )
     )
+
+
 
     return df_output
 
