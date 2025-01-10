@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.11.1 (2025-01-10)
+
+### Bug Fixes
+
+- Test version update after GHTK update
+  ([`671d5b3`](https://github.com/RPifaut/structools/commit/671d5b3fa6814a1e155228cd4332c8d11e0aa013))
+
+
 ## v0.11.0 (2025-01-10)
 
 ### Bug Fixes
