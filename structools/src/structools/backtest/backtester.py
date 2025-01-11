@@ -278,6 +278,12 @@ def all_paths_backtest(arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : n
         return arr_cf, arr_idx_recall, arr_pdi
 
 
+
+# ----------------------------------------------------------------------------------
+# Backtester Class 
+# ----------------------------------------------------------------------------------
+
+
 class Backtester(BaseModel):
 
     class Config:
@@ -296,14 +302,14 @@ class Backtester(BaseModel):
     def init_backtester(cls,
                         product,
                         backtest_length,
-                        investment_horizon,
-                        end_date):
+                        investment_horizon):
         
         """
         Default method to create a backtester instance
         """
 
         # Generate the market
+        end_date = dt.today()
         end_date = pd.Timestamp(end_date).to_pydatetime()
         start_date = end_date - relativedelta(years=investment_horizon + backtest_length)
         market = Market.create_market(
@@ -325,7 +331,98 @@ class Backtester(BaseModel):
     # ---------------------------------------------------------------------------------------
    
 
+    def backtest_autocall(self) -> dict:
 
+        """
+        Main method to run a backtest for a specific product.
+
+        Returns:
+
+            - dict_res (dict): Dictionary containing the backtest results
+
+        """
+
+        # Definition and assignment of the backtest variables
+        prod = self.product
+        undl = prod.underlying
+        NOBS = prod.recall_freq.shape[0] * prod.maturity
+
+        # Feature matrix
+        mat_feat = np.zeros((prod.arr_recall_trigger.shape[0], 3))
+        mat_feat[:, 0] = prod.arr_recall_trigger
+        mat_feat[:, 1] = prod.arr_coupon_trigger
+        mat_feat[:, 2] = prod.arr_coupons
+
+        # Upside participation features array
+        arr_call = np.array(
+            [
+                prod.call_strike,
+                prod.call_leverage,
+                prod.call_cap
+            ]
+        )
+        
+        # Downside protection features array
+        arr_put = np.array(
+            [
+                prod.put_strike,
+                prod.put_barrier,
+                prod.put_leverage,
+                prod.kg
+            ]
+        )
+
+        # Dates
+        END = dt.today()
+        START = END - relativedelta(year=self.investment_horizon + self.backtest_length)
+
+        # Build track of the underlying
+        df_ret = undl.compute_return_compo(DateModel(START),
+                                           DateModel(END),
+                                           True,
+                                           market=self.market
+                                           )
+        
+        df_track = undl.build_track(DateModel(START),
+                                    DateModel(END),
+                                    df_ret
+                                    )[undl.name]
+        
+        # Retrieve the observation values
+        idx_last_date = np.searchsorted(df_track.index, END - relativedelta(years=self.investment_horizon))
+        arr_start_dates = df_track.index[:idx_last_date]
+        NSIM = arr_start_dates.shape[0]
+        mat_obs, mat_dates, arr_min_val, arr_min_date = get_all_observations(arr_start_dates,
+                                                                             NSIM,
+                                                                             prod.recall_freq,
+                                                                             df_track)
+        
+
+        # Removing the first observation (strike date) from the mat_obs
+        mat_obs_perf = mat_obs[:, 1:]
+
+        # Running the backtest
+        arr_cf = np.zeros((NSIM, NOBS))
+        arr_idx_recall = np.zeros(NSIM)
+        arr_ind_pdi = np.zeros(NSIM)
+        arr_cf, arr_idx_recall, arr_ind_pdi = all_paths_backtest(mat_feat, 
+                                                                 arr_call,
+                                                                 arr_put, 
+                                                                 prod.is_memory,
+                                                                 arr_min_val, 
+                                                                 prod.put_barrier_observ,
+                                                                 mat_obs_perf)
+        
+        # Preparing the results
+        return None
+        
+
+        
+
+        
+
+
+            
 
 
 
@@ -337,147 +434,35 @@ class Backtester(BaseModel):
 
         
     
-    # def backtest_autocall(self, price : str = 'Close') -> pd.DataFrame:
+    
+        #     # Compute IRR
+        #     s_recall = pd.Series(np.zeros(len(arr_has_autocalled)), index=arr_coupon_idx)
+        #     s_coupons = pd.Series(np.zeros(len(arr_coupon_paid)), index=arr_coupon_idx)
 
-    #     """
-    #     Method to backtest an autocall product.
+        #     if ind_recall:
+        #         s_recall=s_recall.loc[:recall_date]
+        #         s_recall[-1] = 1
+        #         s_coupons=s_coupons.loc[:recall_date]
+        #     df_temp = pd.concat([s_recall, s_coupons], axis=1)
+        #     arr_cashflows = df_temp.sum(axis=1)
+        #     arr_dates = df_temp.index
+        #     irr = compute_irr(arr_cashflows, arr_dates)
 
-    #     Parameters:
+        #     # Store the results
+        #     arr_autocalled[i]=ind_recall
+        #     arr_recall_period[i]=recall_period if ind_recall else 0
+        #     arr_irr[i]=irr
 
-    #         price (str): Type of price to look at for the data loading
+        #     i+=1
 
-    #     Returns:
+        # # Prepare the output DataFrame
+        # logging.info("Backtest completed!")
+        # df_backtest = pd.DataFrame(
+        #     data=[arr_autocalled, arr_recall_period, arr_irr],
+        #     index=["Has Autocalled", "Autocall Period", "IRR"],
+        #     columns = [f"Simulation {i}" for i in range(len(arr_start))]
+        # )
 
-    #         df_backtest (pd.DataFrame): DataFrame containing the backtest results
-            
-    #     """
-
-    #     UNDERLYING = self.product.underlying.COMPO
-    #     END = dt.date.today()
-    #     START = END - relativedelta(years=self.backtest_length + self.investment_horizon)
-
-    #     # Get the underlying track
-    #     df_perf = self.product.underlying.compute_return_compo(UNDERLYING, START, END)
-
-    #     # General parameters
-    #     last_idx = np.searchsorted(df_perf.index, END - relativedelta(years=self.investment_horizon))
-    #     arr_start = df_perf.index[:last_idx]
-    #     n_sim = len(arr_start)
-    #     df_backtest = pd.DataFrame(
-    #         index=arr_start,
-    #     )
-
-    #     arr_recall_period = np.zeros(n_sim)
-    #     arr_autocalled = np.zeros(n_sim)
-    #     arr_irr = np.zeros(n_sim)
-
-
-    #     # Loop on the dates
-    #     logging.info(f"Backtesting from {START} to {END} for a total of {n_sim} trajectories.")
-    #     i = 0
-    #     for date_init in arr_start:
-
-    #         # Generate the data and temporary variables
-    #         ind_recall = 0
-    #         df_temp = df_perf.loc[date_init:date_init + relativedelta(years=self.investment_horizon)]
-    #         df_temp = self.product.underlying.build_track(DateModel(date=df_temp.index[0]),
-    #                                                       DateModel(date=df_temp.index[-1]),
-    #                                                       df_temp)
-            
-    #         # Arrays of dates for observations
-    #         arr_recall_idx = find_dates_index(DateModel(date=date_init).date,
-    #                                       self.product.maturity * DICT_MATCH_FREQ[self.product.recall_freq],
-    #                                       self.product.recall_freq,
-    #                                       df_temp.index)
-            
-    #         arr_coupon_idx = find_dates_index(DateModel(date=date_init).date,
-    #                                       self.product.product.maturity * DICT_MATCH_FREQ[self.product.coupon_freq],
-    #                                       self.product.coupon_freq,
-    #                                       df_temp.index)
-            
-    #         # Determine whether an autocall event has occurred
-    #         arr_has_autocalled = pd.concat([pd.DataFrame(arr_recall_idx), df_temp], axis=1, join='inner')
-    #         arr_has_autocalled = arr_has_autocalled[self.product.underlying.name] >= self.product.arr_recall_trigger
-            
-    #         if not any(arr_has_autocalled):
-    #             # Case no autocall
-    #             ind_recall = 0
-    #             logging.info(f"Trajectory {i}, started on {date_init} did not autocall.")
-                
-    #         else:
-    #             recall_period = np.argmax(arr_has_autocalled)
-    #             recall_date = df_temp.index[recall_period]
-
-    #         # Determine the coupons that can be paid (exluding the occurrences after the recall for computation efficiency)
-    #         df_coupon = pd.concat([pd.DataFrame(index=arr_coupon_idx), df_temp], axis=1, join='inner')
-    #         if ind_recall == 1:
-    #             df_coupon = df_coupon.loc[:recall_date]
-    #         arr_coupon_paid = df_coupon[self.product.underlying.name] >= self.product.arr_coupon_trigger
-    #         arr_coupon_paid = arr_coupon_paid * self.product.coupon
-
-    #         if self.product.is_memory:
-    #             arr_all_coupon_paid = np.ones(len(arr_coupon_paid)) * self.product.coupon
-    #             arr_all_coupon_paid = arr_all_coupon_paid.cumsum()
-    #             arr_cum_coupon = arr_coupon_paid.cumsum()
-    #             arr_cum_coupon = np.r_[0, arr_all_coupon_paid[:-1]]
-    #             arr_coupon_paid = arr_all_coupon_paid - arr_cum_coupon
-
-    #         # Scenario at maturity if no autocall
-    #         if ind_recall == 0:
-
-    #             # Check for positive performance
-    #             call_perf = self.product.call_leverage * np.min(
-    #                 np.max(
-    #                     df_perf.iloc[-1, 0] - self.call_strike, 0
-    #                 ), self.call_cap
-    #             )
-
-    #             # Check if PDI has been activate, considering the capital guarantee
-    #             if self.product.put_barrier_observ == "EUROPEAN":
-    #                 activated = df_perf.iloc[-1, 0] <= self.product.put_barrier
-    #             else:
-    #                 activated = any(df_perf[self.product.underlying.name] <= self.product.put_barrier)
-
-    #             if activated:
-    #                 logging.INFO(f"Trajectory {i}, started on {date_init}, trigger a barrier event.")
-
-    #             pdi_loss = np.min(
-    #                 activated * self.product.put_leverage * np.max(
-    #                     self.product.put_strike - df_temp.iloc[-1, 0], 0
-    #                 ), 1 - self.product.kg
-    #             )
-
-    #             payoff_matu = 1 + call_perf - pdi_loss
-    #             arr_coupon_paid[-1] += payoff_matu
-
-    #         # Compute IRR
-    #         s_recall = pd.Series(np.zeros(len(arr_has_autocalled)), index=arr_coupon_idx)
-    #         s_coupons = pd.Series(np.zeros(len(arr_coupon_paid)), index=arr_coupon_idx)
-
-    #         if ind_recall:
-    #             s_recall=s_recall.loc[:recall_date]
-    #             s_recall[-1] = 1
-    #             s_coupons=s_coupons.loc[:recall_date]
-    #         df_temp = pd.concat([s_recall, s_coupons], axis=1)
-    #         arr_cashflows = df_temp.sum(axis=1)
-    #         arr_dates = df_temp.index
-    #         irr = compute_irr(arr_cashflows, arr_dates)
-
-    #         # Store the results
-    #         arr_autocalled[i]=ind_recall
-    #         arr_recall_period[i]=recall_period if ind_recall else 0
-    #         arr_irr[i]=irr
-
-    #         i+=1
-
-    #     # Prepare the output DataFrame
-    #     logging.info("Backtest completed!")
-    #     df_backtest = pd.DataFrame(
-    #         data=[arr_autocalled, arr_recall_period, arr_irr],
-    #         index=["Has Autocalled", "Autocall Period", "IRR"],
-    #         columns = [f"Simulation {i}" for i in range(len(arr_start))]
-    #     )
-
-    #     return df_backtest
+        # return df_backtest
 
 
