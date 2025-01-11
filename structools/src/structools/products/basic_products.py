@@ -375,3 +375,7 @@ class Option(OptionBaseModel):
             vol=vol,
             time_to_maturity=time_to_maturity
         )
+    
+if __name__ == "__main__":
+
+    my_object = Underlying()
