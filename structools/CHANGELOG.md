@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.15.2 (2025-01-11)
+
+### Bug Fixes
+
+- Starting to develop the display_result function
+  ([`640a2ea`](https://github.com/RPifaut/structools/commit/640a2eac054a7b9b7c1e76841c3fe1efac25bdb5))
+
+
 ## v0.15.1 (2025-01-11)
 
 ### Bug Fixes
