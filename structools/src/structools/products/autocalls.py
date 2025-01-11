@@ -194,7 +194,7 @@ class Phoenix(Autocall):
         # Definition of the triggers arrays
         n_obs_recall = DICT_MATCH_FREQ[recall_freq]
         arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
-        arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_coupon * maturity)
+        arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_recall * maturity)
         arr_coupons = np.ones(len(arr_coupon_triggers)) * coupon
 
 
@@ -239,7 +239,6 @@ class Athena(Autocall):
                 first_trigger: float = Autocall.model_fields['first_trigger'].default,
                 step_down: float = Autocall.model_fields['step_down'].default,
                 coupon: float = Autocall.model_fields['coupon'].default,
-                coupon_freq: str = Autocall.model_fields['coupon_freq'].default,
                 start_coupon: int = Autocall.model_fields['start_coupon'].default,
                 call_strike: float = Autocall.model_fields['call_strike'].default,
                 call_leverage: float = Autocall.model_fields['call_leverage'].default,
@@ -273,7 +272,6 @@ class Athena(Autocall):
             coupon=coupon, 
             coupon_trigger=first_trigger,
             start_coupon=start_coupon, 
-            coupon_freq=coupon_freq,
             is_memory=True,
             call_strike=call_strike,
             call_leverage=call_leverage,

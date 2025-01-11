@@ -28,7 +28,7 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
-my_phoenix = Phoenix.from_params(underlying=my_basket, start_recall=9)
+my_phoenix = Athena.from_params(underlying=my_basket, start_recall=9)
 start = DateModel(date="2000-01-01")
 end = DateModel(date=date.today())
 
