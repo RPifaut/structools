@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.15.1 (2025-01-11)
+
+### Bug Fixes
+
+- Backup for the main backtest method
+  ([`4c7958c`](https://github.com/RPifaut/structools/commit/4c7958c984500ff237e9dafbee8673259d4f4b3d))
+
+
 ## v0.15.0 (2025-01-11)
 
 ### Features
