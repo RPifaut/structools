@@ -1,6 +1,7 @@
 import numpy as np
+import pandas as pd
 from datetime import datetime, date
-from pydantic import BaseModel, validator
+from pydantic import BaseModel, field_validator
 from datetime import date
 from dateutil.relativedelta import relativedelta
 
@@ -23,52 +24,6 @@ DICT_MATCH_FREQ = {
 }
 
 
-
-# ---------------------------------------------------------------------------------------------
-# Functions
-# ---------------------------------------------------------------------------------------------
-
-def find_dates_index(ref_date : np.datetime64, n_obs : int, freq : str, index : np.ndarray):
-
-    """
-    Function that returns an array containing the observation dates given a array of dates.
-
-    Parameters:
-        ref_date: Reference date, starting point for the search
-        n_obs: Number of observation from the strike date.
-        freq: Frequency of the observations.
-        index: Array (pd.Index-like) containing a set of possible observation dates.
-
-    Returns:
-        arr_dates: Array containing the real observation dates.
-    """
-
-
-    # Variables check
-    if freq not in L_FREQ:
-        raise ValueError(f"Frequency not support. Possible values: {L_FREQ}")
-    
-
-    # Find the next theoretical date to find a match in the index
-    if freq == "W":
-        dates_to_match = [ref_date + relativedelta(weeks = 1 + i) for i in range(n_obs)]
-    elif freq == "M":
-        dates_to_match = [ref_date + relativedelta(months = 1 + i) for i in range(n_obs)]
-    elif freq == "Q":
-        dates_to_match = [ref_date + relativedelta(months = 3 * (1 + i)) for i in range(n_obs)]
-    elif freq == "S":
-        dates_to_match = [ref_date + relativedelta(months = 6 * (1 + i)) for i in range(n_obs)]
-    else:
-        dates_to_match = [ref_date + relativedelta(years = 1 + i) for i in range(n_obs)]
-
-    # Find the index
-    matched_indices = np.searchsorted(index, dates_to_match)
-
-    return index[matched_indices]
-
-
-
-
 # ---------------------------------------------------------------------------------------------
 # Classes
 # ---------------------------------------------------------------------------------------------
@@ -82,7 +37,7 @@ class DateModel(BaseModel):
     class Config:
         arbitrary_types_allowed = True
 
-    @validator("date", pre=True)
+    @field_validator("date", mode="before")
     def convert_to_datetime64(cls, value):
 
         """
@@ -118,30 +73,39 @@ class DateModel(BaseModel):
         """
 
         return np.datetime_as_string(self.date, 'D')
+    
 
 
 
+# ---------------------------------------------------------------------------------------------
+# Functions
+# ---------------------------------------------------------------------------------------------
 
-
+    
 def find_dates_index(ref_date : np.datetime64, n_obs : int, freq : str, index : np.ndarray):
 
     """
     Function that returns an array containing the observation dates given a array of dates.
 
     Parameters:
-        ref_date: Reference date, starting point for the search
-        n_obs: Number of observation from the strike date.
-        freq: Frequency of the observations.
-        index: Array (pd.Index-like) containing a set of possible observation dates.
+
+        - ref_date: Reference date, starting point for the search
+        - n_obs: Number of observation from the strike date.
+        - freq: Frequency of the observations.    
+        - index: Array (pd.Index-like) containing a set of possible observation dates.
 
     Returns:
-        arr_dates: Array containing the real observation dates.
+
+        - arr_dates: Array containing the real observation dates.
     """
 
 
     # Variables check
     if freq not in L_FREQ:
         raise ValueError(f"Frequency not support. Possible values: {L_FREQ}")
+    
+    # Convert to datetime for easier use with relativedelta
+    ref_date = pd.Timestamp(ref_date).to_pydatetime()
     
 
     # Find the next theoretical date to find a match in the index
@@ -156,7 +120,15 @@ def find_dates_index(ref_date : np.datetime64, n_obs : int, freq : str, index : 
     else:
         dates_to_match = [ref_date + relativedelta(years = 1 + i) for i in range(n_obs)]
 
+    # Convert back to np.datetime64
+    dates_to_match = list(
+        map(
+            lambda date: np.datetime64(date.strftime("%Y-%m-%d")),
+            dates_to_match
+        )
+    )
+
     # Find the index
     matched_indices = np.searchsorted(index, dates_to_match)
 
-    return index[matched_indices]
+    return matched_indices

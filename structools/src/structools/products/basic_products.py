@@ -89,7 +89,7 @@ class Underlying(BaseModel):
         return self
 
 
-    def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True):
+    def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None):
 
         pass
 
@@ -140,7 +140,7 @@ class Basket(Underlying):
                    WEIGHTS=weights)
     
 
-    def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, price : str = 'Close') -> pd.DataFrame:
+    def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None, price : str = 'Close') -> pd.DataFrame:
 
         """
         Method to compute the return of a Basket
@@ -166,7 +166,10 @@ class Basket(Underlying):
             raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
         
         # Load the data
-        market = Market.create_market(self.COMPO, start_date, end_date, uniform)
+        if not market:
+            logging.info("MISSING Market. Retrieving market data...")
+            market = Market.create_market(self.COMPO, start_date, end_date, uniform)
+            logging.info("Market Data Sucessfullu loaded.")
 
         # Create a dataframe with the values we are interested in
         df_perf = pd.DataFrame(
