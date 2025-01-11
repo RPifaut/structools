@@ -73,12 +73,18 @@ def get_observations_values(start_date : np.datetime64, n_obs : int, freq : str,
 
     """
 
+    # Find the important observation dates
     idx_dates = find_dates_index(start_date, n_obs, freq, df_underlying.index)
     arr_dates = np.r_[start_date, df_underlying.index.values[idx_dates]]
     arr_obs_perf = np.r_[df_underlying[start_date], df_underlying.values[idx_dates]]
-    arr_obs_perf = arr_obs_perf / arr_obs_perf[0], arr_dates
+    arr_obs_perf = arr_obs_perf / arr_obs_perf[0]
+
+    # Find the worst performance to know whether barrier hit and when
+    df_temp = df_underlying.loc[start_date:arr_dates[-1]]
+    min_val = df_temp.min()
+    date_min = df_temp.idxmin()
     
-    return arr_obs_perf
+    return arr_obs_perf, arr_dates, min_val, date_min
 
 
 def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, df_underlying : pd.DataFrame) -> np.ndarray:
@@ -95,20 +101,22 @@ def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, 
 
     Returns:
 
-        - (arr_obs_perf, arr_dates) (tup): Tuple containing matrices with the values on the observation dates and the observation dates.
+        - (arr_obs_perf, arr_dates, arr_min_val, arr_min_dates) (tup): Tuple containing matrices with the values on the observation dates and the observation dates.
 
     """
 
     # Matrix containing the results
     mat_obs_perf = np.zeros((len(arr_start_dates), n_obs+1))
     mat_obs_dates = np.empty((len(arr_start_dates), n_obs+1), dtype="datetime64[D]")
+    arr_min_val = np.zeros(len(arr_start_dates))
+    arr_min_dates = np.empty(len(arr_start_dates), dtype="datetime64[D]")
 
     # Retrieving the arrays of values
     for i in range(len(arr_start_dates)):
-        obs, dates = get_observations_values(arr_start_dates[i], n_obs, freq, df_underlying)
-        mat_obs_perf[i, :], mat_obs_dates[i, :] = obs, dates
+        obs, dates, min_val, min_date = get_observations_values(arr_start_dates[i], n_obs, freq, df_underlying)
+        mat_obs_perf[i, :], mat_obs_dates[i, :], arr_min_val[i], arr_min_dates[i] = obs, dates, min_val, min_date
 
-    return mat_obs_perf, mat_obs_dates
+    return mat_obs_perf, mat_obs_dates, arr_min_val, arr_min_dates
 
 
 

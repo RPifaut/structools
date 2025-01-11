@@ -39,8 +39,10 @@ last_date = DateModel(date="2005-01-01")
 length = 10
 
 arr_start = df_track.index[:np.searchsorted(df_track.index.values, last_date.date)].values
-mat_obs, mat_dates = get_all_observations(arr_start, 60, "M", df_track)
+mat_obs, mat_dates, arr_min, arr_dates = get_all_observations(arr_start, 60, "M", df_track)
 df_ret = pd.DataFrame(mat_obs, index=arr_start)
 df_dates = pd.DataFrame(mat_dates, index = arr_start)
 print(df_ret)
 print(df_dates)
+print(arr_min)
+print(arr_dates)
