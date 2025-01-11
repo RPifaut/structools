@@ -28,78 +28,78 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
-my_phoenix = Athena.from_params(maturity=10, recall_freq="M", underlying=my_basket, start_recall=36)
+my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
 start = DateModel(date="2000-01-01")
 end = DateModel(date=date.today())
-
-my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity, date.today())
-print(my_bt.market)
-df_ret = my_bt.product.underlying.compute_return_compo(start, end, True, market = my_bt.market)
-df_track = my_bt.product.underlying.build_track(start, end, df_ret)[my_basket.name]
-fig = my_basket.plot_track(start, end)
-fig.show()
-print(df_track)
-END = pd.Timestamp(df_track.index[-1]).to_pydatetime() - relativedelta(years=my_bt.investment_horizon)
-START = END - relativedelta(years=my_bt.investment_horizon + my_bt.backtest_length)
+my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity)
+res = my_bt.backtest_autocall()
+print(res)
+# print(my_bt.market)
+# df_ret = my_bt.product.underlying.compute_return_compo(start, end, True, market = my_bt.market)
+# df_track = my_bt.product.underlying.build_track(start, end, df_ret)[my_basket.name]
+# fig = my_basket.plot_track(start, end)
+# fig.show()
+# print(df_track)
+# END = pd.Timestamp(df_track.index[-1]).to_pydatetime() - relativedelta(years=my_bt.investment_horizon)
+# START = END - relativedelta(years=my_bt.investment_horizon + my_bt.backtest_length)
+# # END = np.searchsorted(df_track.index, END)
+# idx = np.searchsorted(df_track.index, END + relativedelta(years=my_bt.investment_horizon))
+# print(df_track.index[idx])
 # END = np.searchsorted(df_track.index, END)
-idx = np.searchsorted(df_track.index, END + relativedelta(years=my_bt.investment_horizon))
-print(df_track.index[idx])
-END = np.searchsorted(df_track.index, END)
-arr_dates = df_track.index[:END]
-print(arr_dates)
-mat_obs, mat_dates, arr_min_val, arr_min_dates = get_all_observations(arr_dates, len(my_bt.product.arr_coupon_trigger), my_bt.product.recall_freq, df_track)
+# arr_dates = df_track.index[:END]
+# print(arr_dates)
+# mat_obs, mat_dates, arr_min_val, arr_min_dates = get_all_observations(arr_dates, len(my_bt.product.arr_coupon_trigger), my_bt.product.recall_freq, df_track)
 
-print(mat_obs[:, 1:])
-print(mat_obs[:, 1:].shape)
-arr_feat = np.zeros((len(my_phoenix.arr_recall_trigger), 4))
-arr_feat[:, 0] = my_phoenix.arr_recall_trigger
-arr_feat[:, 1] = my_phoenix.arr_coupon_trigger
-arr_feat[:, 2] = my_phoenix.arr_coupons
+# print(mat_obs[:, 1:])
+# print(mat_obs[:, 1:].shape)
+# arr_feat = np.zeros((len(my_phoenix.arr_recall_trigger), 4))
+# arr_feat[:, 0] = my_phoenix.arr_recall_trigger
+# arr_feat[:, 1] = my_phoenix.arr_coupon_trigger
+# arr_feat[:, 2] = my_phoenix.arr_coupons
 
-arr_call = np.array(
-    [
-        my_phoenix.call_strike,
-        my_phoenix.call_leverage,
-        my_phoenix.call_cap
-    ]
-)
+# arr_call = np.array(
+#     [
+#         my_phoenix.call_strike,
+#         my_phoenix.call_leverage,
+#         my_phoenix.call_cap
+#     ]
+# )
 
-arr_put = np.array(
-    [
-        my_phoenix.put_strike,
-        my_phoenix.put_barrier,
-        my_phoenix.put_leverage,
-        my_phoenix.kg
-    ]
-)
+# arr_put = np.array(
+#     [
+#         my_phoenix.put_strike,
+#         my_phoenix.put_barrier,
+#         my_phoenix.put_leverage,
+#         my_phoenix.kg
+#     ]
+# )
 
-print(f"""
+# print(f"""
 
-matrix in use:
+# matrix in use:
       
       
-      {mat_obs[0, 1:]}""")
+#       {mat_obs[0, 1:]}""")
 
 
-arr_cf, idx, ind_pdi = all_paths_backtest(
-    arr_feat=arr_feat,
-    arr_call=arr_call,
-    arr_put=arr_put,
-    memory=my_phoenix.is_memory,
-    arr_min_val=arr_min_val,
-    put_obs=my_phoenix.put_barrier_observ,
-    mat_obs=mat_obs[:, 1:]
-)
+# arr_cf, idx, ind_pdi = all_paths_backtest(
+#     arr_feat=arr_feat,
+#     arr_call=arr_call,
+#     arr_put=arr_put,
+#     memory=my_phoenix.is_memory,
+#     arr_min_val=arr_min_val,
+#     put_obs=my_phoenix.put_barrier_observ,
+#     mat_obs=mat_obs[:, 1:]
+# )
 
-df_feat = pd.DataFrame(arr_feat)
-df_cf = pd.DataFrame(arr_cf, index=arr_dates)
-df_obs = pd.DataFrame(mat_obs, index=arr_dates)
-df_dates = pd.DataFrame(mat_dates, index=arr_dates)
+# print(arr_cf)
+# print(arr_cf.shape)
+# df_feat = pd.DataFrame(arr_feat)
+# df_cf = pd.DataFrame(arr_cf, index=arr_dates)
+# df_obs = pd.DataFrame(mat_obs, index=arr_dates)
+# df_dates = pd.DataFrame(mat_dates, index=arr_dates)
 
-df_feat.to_excel("Features.xlsx")
-df_cf.to_excel("Cashflows.xlsx")
-df_obs.to_excel("Observations.xlsx")
-df_dates.to_excel('Dates.xlsx')
-
-
-print(arr_cf)
+# df_feat.to_excel("Features.xlsx")
+# df_cf.to_excel("Cashflows.xlsx")
+# df_obs.to_excel("Observations.xlsx")
+# df_dates.to_excel('Dates.xlsx')

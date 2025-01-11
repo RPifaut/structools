@@ -20,6 +20,7 @@ logging.basicConfig(level=logging.INFO)
 
 # Default objects
 default_market = Market(data=dict())
+VOID = -999
 
 # ----------------------------------------------------------------------------------
 # Tool Functions 
@@ -41,7 +42,7 @@ def compute_irr(arr_cashflows : np.ndarray, arr_dates : np.ndarray):
     """
 
     arr_time_since_incept = np.array(
-        [(date - arr_dates[0]) / ACT for date in arr_dates]
+        [(date - arr_dates[0]).astype(int) / ACT for date in arr_dates]
     )
     # Tool function that computes the NPV of the investment
     def npv(irr):
@@ -80,6 +81,11 @@ def get_observations_values(start_date : np.datetime64, n_obs : int, freq : str,
 
     # Find the important observation dates
     idx_dates = find_dates_index(start_date, n_obs, freq, df_underlying.index)
+
+    # Making sure all the index are valid
+    if any(idx_dates >= df_underlying.index.shape[0]):
+        logging.info(f"Missing data due to dates in the future. Disregarding the simulation starting on: {start_date}")
+        return np.array([VOID for i in range(n_obs+1)]), np.array([DateModel(date=start_date).date for i in range(n_obs+1)]), VOID, VOID
     arr_dates = np.r_[DateModel(date=start_date).date, df_underlying.index.values[idx_dates]]
     arr_obs_perf = np.r_[df_underlying[start_date], df_underlying.values[idx_dates]]
     arr_obs_perf = arr_obs_perf / arr_obs_perf[0]
@@ -125,6 +131,69 @@ def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, 
 
     return mat_obs_perf, mat_obs_dates, arr_min_val, arr_min_dates
 
+@timer
+def display_results(df_track : pd.DataFrame, arr_cf : np.ndarray, arr_idx_recall : np.ndarray, 
+                    arr_ind_pdi : np.ndarray, mat_dates : np.ndarray) -> dict:
+
+    """
+    Function to present the results of the backtest
+
+    Parameters:
+
+        - df_track (pd.DataFrame): DataFrame containing the track of the underlying during the backtest.
+        - arr_cf (np.ndarray): Matrix containing the cashflows related to each trajectory.
+        - arr_idx_recall (np.ndarray): Array containing the indices of the periods at which an autocall event occurred, if any.
+        - arr_ind_pdi (np.ndarray): Array containing the indicators about the occurrence of a barrier hit event.
+        - mat_dates (np.ndarray): Matrix containing the observation date of each simulation.
+
+    Return:
+
+        - dict_res (dict): Dictionary containing the results of the backtest.
+
+    """
+
+    # Global variables
+    N = arr_idx_recall.shape[0]
+    dict_res = {}
+    dict_res.update({"Number of trajectories": N})
+    dict_res.update({"Underlying Track": df_track})
+
+    # Compute metrics regarding the Autocall events
+    arr_recall_periods = np.zeros((2, mat_dates.shape[1]-1))
+    arr_recall_periods[0, :] = np.arange(mat_dates.shape[1]-1, dtype=int)
+    for i in arr_recall_periods[0, :]:
+        arr_recall_periods[1, int(i)] = sum(arr_idx_recall == int(i))
+    arr_recall_periods[1, :] = arr_recall_periods[1, :] / N
+    arr_recall_periods[0, :] += 1
+    dict_res.update({"Recall Probabilities": arr_recall_periods})
+
+    proba_autocall = arr_recall_periods[1, :-1].sum()
+    dict_res.update({"Autocall Proba": proba_autocall})
+
+    # Compute metrics related to the PDI
+    proba_hit = sum(arr_ind_pdi) / N
+    dict_res.update({"PDI Activation Proba": proba_hit})
+
+    # IRR Computations
+    arr_irr = np.zeros(N)
+    arr_cf = np.hstack((np.ones((N, 1)) * (-1), arr_cf))
+    for i in range(N):
+        logging.info(f"Computing IRR for {int(i)}-th simulation")
+        idx = arr_idx_recall[i]
+        arr_cashflows = arr_cf[i][:int(idx)+2]
+        arr_irr[i] = compute_irr(arr_cashflows, mat_dates[i, :int(idx)+2])
+    
+    # IRR Statistics
+    dict_irr_stats={
+        "Average": arr_irr.mean(),
+        "25% Percentile": np.percentile(arr_irr, 25),
+        "Median": np.percentile(arr_irr, 50), 
+        "75%": np.percentile(arr_irr, 75)
+    }
+
+    dict_res.update({"IRR Stats:": dict_irr_stats})
+
+    return dict_res
 
 
 
@@ -225,7 +294,7 @@ def mono_path_backtest(arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : n
             arr_cashflows[-1] += 1          # Capital added in case of recall
 
         # Adjusting the length of the cashflows
-        arr_return = np.ones(arr_recall.shape[0]) * (-999)
+        arr_return = np.ones(arr_recall.shape[0]) * (VOID)
         arr_return[:idx_recall+1] = arr_cashflows
 
         return arr_return, idx_recall, ind_pdi
@@ -330,7 +399,7 @@ class Backtester(BaseModel):
     # Backtester for the autocalls
     # ---------------------------------------------------------------------------------------
    
-
+    @timer
     def backtest_autocall(self) -> dict:
 
         """
@@ -345,7 +414,8 @@ class Backtester(BaseModel):
         # Definition and assignment of the backtest variables
         prod = self.product
         undl = prod.underlying
-        NOBS = prod.recall_freq.shape[0] * prod.maturity
+        NOBS = prod.arr_recall_trigger.shape[0]
+        logging.info(f"Number of observations: {NOBS}.")
 
         # Feature matrix
         mat_feat = np.zeros((prod.arr_recall_trigger.shape[0], 3))
@@ -374,29 +444,33 @@ class Backtester(BaseModel):
 
         # Dates
         END = dt.today()
-        START = END - relativedelta(year=self.investment_horizon + self.backtest_length)
+        START = END - relativedelta(years=self.investment_horizon + self.backtest_length)
 
         # Build track of the underlying
-        df_ret = undl.compute_return_compo(DateModel(START),
-                                           DateModel(END),
+        df_ret = undl.compute_return_compo(DateModel(date=START),
+                                           DateModel(date=END),
                                            True,
                                            market=self.market
                                            )
         
-        df_track = undl.build_track(DateModel(START),
-                                    DateModel(END),
+        df_track = undl.build_track(DateModel(date=START),
+                                    DateModel(date=END),
                                     df_ret
                                     )[undl.name]
         
         # Retrieve the observation values
         idx_last_date = np.searchsorted(df_track.index, END - relativedelta(years=self.investment_horizon))
         arr_start_dates = df_track.index[:idx_last_date]
+        logging.info(f"Last Starting Date: {arr_start_dates[-1]}")
         NSIM = arr_start_dates.shape[0]
         mat_obs, mat_dates, arr_min_val, arr_min_date = get_all_observations(arr_start_dates,
-                                                                             NSIM,
+                                                                             NOBS,
                                                                              prod.recall_freq,
                                                                              df_track)
         
+
+        # Removing the starting dates for which we do not have enough data
+        mat_obs = np.delete(mat_obs, np.where(mat_obs[:, 0] == VOID)[0], axis=0)
 
         # Removing the first observation (strike date) from the mat_obs
         mat_obs_perf = mat_obs[:, 1:]
@@ -413,56 +487,14 @@ class Backtester(BaseModel):
                                                                  prod.put_barrier_observ,
                                                                  mat_obs_perf)
         
+        print(arr_cf)
+        print(arr_idx_recall)
         # Preparing the results
-        return None
-        
+        dict_res = display_results(df_track,
+                                   arr_cf,
+                                   arr_idx_recall,
+                                   arr_ind_pdi,
+                                   mat_dates)  
 
-        
-
-        
-
-
-            
-
-
-
-
-
-            
-
-
-
-        
-    
-    
-        #     # Compute IRR
-        #     s_recall = pd.Series(np.zeros(len(arr_has_autocalled)), index=arr_coupon_idx)
-        #     s_coupons = pd.Series(np.zeros(len(arr_coupon_paid)), index=arr_coupon_idx)
-
-        #     if ind_recall:
-        #         s_recall=s_recall.loc[:recall_date]
-        #         s_recall[-1] = 1
-        #         s_coupons=s_coupons.loc[:recall_date]
-        #     df_temp = pd.concat([s_recall, s_coupons], axis=1)
-        #     arr_cashflows = df_temp.sum(axis=1)
-        #     arr_dates = df_temp.index
-        #     irr = compute_irr(arr_cashflows, arr_dates)
-
-        #     # Store the results
-        #     arr_autocalled[i]=ind_recall
-        #     arr_recall_period[i]=recall_period if ind_recall else 0
-        #     arr_irr[i]=irr
-
-        #     i+=1
-
-        # # Prepare the output DataFrame
-        # logging.info("Backtest completed!")
-        # df_backtest = pd.DataFrame(
-        #     data=[arr_autocalled, arr_recall_period, arr_irr],
-        #     index=["Has Autocalled", "Autocall Period", "IRR"],
-        #     columns = [f"Simulation {i}" for i in range(len(arr_start))]
-        # )
-
-        # return df_backtest
-
-
+        logging.info("Backtest completed!")
+        return dict_res      
