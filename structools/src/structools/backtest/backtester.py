@@ -69,13 +69,14 @@ def get_observations_values(start_date : np.datetime64, n_obs : int, freq : str,
 
     Returns:
 
-        - arr_obs_perf (np.ndarray): Matrix containing the underlying's values on the observation date
+        - (arr_obs_perf, arr_dates) (tup): Tuple containing arrays with the values on the observation dates and the observation dates.
 
     """
 
     idx_dates = find_dates_index(start_date, n_obs, freq, df_underlying.index)
+    arr_dates = np.r_[start_date, df_underlying.index.values[idx_dates]]
     arr_obs_perf = np.r_[df_underlying[start_date], df_underlying.values[idx_dates]]
-    arr_obs_perf = arr_obs_perf / arr_obs_perf[0]
+    arr_obs_perf = arr_obs_perf / arr_obs_perf[0], arr_dates
     
     return arr_obs_perf
 
@@ -94,18 +95,22 @@ def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, 
 
     Returns:
 
-        - arr_obs_perf (np.ndarray): Matrix containing the underlying's values on the observation date
+        - (arr_obs_perf, arr_dates) (tup): Tuple containing matrices with the values on the observation dates and the observation dates.
 
     """
 
     # Matrix containing the results
     mat_obs_perf = np.zeros((len(arr_start_dates), n_obs+1))
+    mat_obs_dates = np.empty((len(arr_start_dates), n_obs+1), dtype="datetime64[D]")
 
     # Retrieving the arrays of values
     for i in range(len(arr_start_dates)):
-        mat_obs_perf[i, :] = get_observations_values(arr_start_dates[i], n_obs, freq, df_underlying)
+        obs, dates = get_observations_values(arr_start_dates[i], n_obs, freq, df_underlying)
+        mat_obs_perf[i, :], mat_obs_dates[i, :] = obs, dates
 
-    return mat_obs_perf
+    return mat_obs_perf, mat_obs_dates
+
+
 
 
 class Backtester(BaseModel):
