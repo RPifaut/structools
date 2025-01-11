@@ -12,7 +12,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 # List with the possible type of observation for the put
-L_OBS_PUT = ["European", "American"]
+L_OBS_PUT = ["EUROPEAN", "AMERICAN"]
 
 # Default objects
 
@@ -117,6 +117,11 @@ class Autocall(BaseModel):
         description="Array containing the dates to be matched for the coupon condition."
     )
 
+    arr_coupons: np.ndarray = Field(
+        default_factory=lambda: np.array([]),
+        description="Array containing the values of the coupon at each date."
+    )
+
     arr_put_observ : np.ndarray = Field(
         default_factory=lambda: np.array([]),
         description="Array containing the dates on which we shall observe the barrier for the put"
@@ -193,6 +198,7 @@ class Phoenix(Autocall):
         n_obs_coupon = DICT_MATCH_FREQ[coupon_freq]
         arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
         arr_coupon_triggers = build_trigger_array(coupon_trigger, 0, start_coupon, n_obs_coupon * maturity)
+        arr_coupons = np.ones(len(arr_coupon_triggers)) * coupon
 
 
         return cls(
@@ -218,7 +224,8 @@ class Phoenix(Autocall):
             put_barrier_observ=put_barrier_observ,
             kg=kg,
             arr_recall_trigger=arr_recall_triggers,
-            arr_coupon_trigger=arr_coupon_triggers
+            arr_coupon_trigger=arr_coupon_triggers,
+            arr_coupons=arr_coupons
         )
 
     
@@ -254,6 +261,8 @@ class Athena(Autocall):
         # In the case of an Athena structure, coupons are paid upon redemption. Therefore coupon and recall triggers are the same
         n_obs_recall = DICT_MATCH_FREQ[recall_freq]
         arr_recall_triggers = build_trigger_array(first_trigger, step_down, start_recall, n_obs_recall * maturity)
+        arr_coupons = np.ones(len(arr_recall_triggers)) * coupon
+
 
         
         return cls(
@@ -279,5 +288,6 @@ class Athena(Autocall):
             put_barrier_observ=put_barrier_observ,
             kg=kg,
             arr_recall_trigger=arr_recall_triggers,
-            arr_coupon_trigger=arr_recall_triggers
+            arr_coupon_trigger=arr_recall_triggers,
+            arr_coupons=arr_coupons
         )
