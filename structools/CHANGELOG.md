@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.15.0 (2025-01-11)
+
+### Features
+
+- Adding the function to compute all the cashflows in the backtest
+  ([`6d88732`](https://github.com/RPifaut/structools/commit/6d887320a30a82365e6f1d651c7699a9f426a6fe))
+
+
 ## v0.14.0 (2025-01-11)
 
 ### Features
