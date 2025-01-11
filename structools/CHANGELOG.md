@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.14.0 (2025-01-11)
+
+### Features
+
+- Adding major function for product's backtest + merging changes from other branches - better
+  handling of data types
+  ([`a3689bc`](https://github.com/RPifaut/structools/commit/a3689bc06ebc37449a43c25faea269f05fe9b4b9))
+
+
 ## v0.13.0 (2025-01-10)
 
 ### Features
