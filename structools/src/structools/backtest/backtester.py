@@ -131,13 +131,13 @@ def get_all_observations(arr_start_dates : np.ndarray, n_obs : int, freq : str, 
 # ----------------------------------------------------------------------------------
 # Backtest Functions 
 # ----------------------------------------------------------------------------------
-@timer
+
 # @jit(nopython=True)
 def mono_path_backtest(arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : np.ndarray, memory : bool, 
-                           min_val : float, put_obs : str, arr_obs : np.ndarray) -> np.ndarray:
+                           min_val : float, put_obs : str, arr_obs : np.ndarray):
 
         """
-        Method running a backtest on one given path.
+        Function running a backtest on one given path.
 
         Parameters:
 
@@ -224,8 +224,58 @@ def mono_path_backtest(arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : n
         else:
             arr_cashflows[-1] += 1          # Capital added in case of recall
 
-        return arr_cashflows, idx_recall, ind_pdi
+        # Adjusting the length of the cashflows
+        arr_return = np.ones(arr_recall.shape[0]) * (-999)
+        arr_return[:idx_recall+1] = arr_cashflows
 
+        return arr_return, idx_recall, ind_pdi
+
+
+@timer
+def all_paths_backtest(arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : np.ndarray, memory : bool, 
+                           arr_min_val : np.ndarray, put_obs : str, mat_obs : np.ndarray):
+    
+        """
+        Function running a backtest on all paths.
+
+        Parameters:
+
+            - arr_feat (np.ndarray): Array containing the ordered necessary product features.
+            - arr_call (np.ndarray): Array containing the call features for upside performance at maturity.
+            - arr_put (np.ndarray): Array containing the put features for the downside protection at maturity.
+            - memory (bool): Whether the product has memory coupons or not
+            - min_val (np.ndarray): Minimum value reached during the product's life.
+            - put_obs (str): Put activation observation
+            - mat_obs (np.ndarray): Matrices containing the observation values of the relevant observation dates.
+
+        Returns:
+
+            - arr_cashflow (np.ndarray): Array containing the cashflows of the simulation.
+            - idx_recall (int): Index of the recall period if any.
+            - ind_pdi (bool): Indicator of barrier hit.
+
+        """
+
+        # Output parameters
+        NSIM = mat_obs.shape[0]
+        NOBS = arr_feat.shape[0]
+        arr_cf = np.zeros((NSIM, NOBS))                     # Array storing the cashflows related to each simulation
+        arr_idx_recall = np.zeros(NSIM)                     # Array storing the recall index period
+        arr_pdi = np.zeros(NSIM)                            # Array storing the indicators of downside protection activation
+
+        # Looping on the dates
+        for i in range(NSIM):
+            arr_cf[i, :], arr_idx_recall[i], arr_pdi[i] = mono_path_backtest(
+                arr_feat=arr_feat, 
+                arr_call=arr_call,
+                arr_put=arr_put, 
+                memory=memory,
+                min_val=arr_min_val[i],
+                put_obs=put_obs,
+                arr_obs=mat_obs[i,:]
+            )
+
+        return arr_cf, arr_idx_recall, arr_pdi
 
 
 class Backtester(BaseModel):
@@ -273,97 +323,7 @@ class Backtester(BaseModel):
     # ---------------------------------------------------------------------------------------
     # Backtester for the autocalls
     # ---------------------------------------------------------------------------------------
-    # @jit(nopython=True)
-    # def mono_path_backtest(self, arr_feat : np.ndarray, arr_call : np.ndarray, arr_put : np.ndarray, memory : bool, 
-    #                        min_val : float, put_obs : str, arr_obs : np.ndarray) -> np.ndarray:
-
-    #     """
-    #     Method running a backtest on one given path.
-
-    #     Parameters:
-
-    #         - arr_feat (np.ndarray): Array containing the ordered necessary product features.
-    #         - arr_call (np.ndarray): Array containing the call features for upside performance at maturity.
-    #         - arr_put (np.ndarray): Array containing the put features for the downside protection at maturity.
-    #         - memory (bool): Whether the product has memory coupons or not
-    #         - min_val (float): Minimum value reached during the product's life.
-    #         - put_obs (str): Put activation observation
-    #         - arr_obs (np.ndarray): Array containing the observation values of the relevant observation dates.
-
-    #     Returns:
-
-    #         - arr_cashflow (np.ndarray): Array containing the cashflows of the simulation.
-    #         - idx_recall (int): Index of the recall period if any.
-    #         - ind_pdi (bool): Indicator of barrier hit.
-
-    #     """
-
-
-    #     # Recall condition
-    #     arr_recall = arr_obs >= arr_feat[:, 0]
-    #     if np.any(arr_recall):
-    #         idx_recall = np.argmax(arr_recall)
-    #     else:
-    #         idx_recall = len(arr_recall) - 1
-
-    #     # Output arrays
-    #     arr_paid_coupon = np.zeros(idx_recall+1)
-    #     arr_cashflows = np.zeros(idx_recall+1)
-
-    #     # Coupon payment - immediately resized in case of autocall for performance effiency
-    #     if idx_recall != len(arr_recall) - 1:
-    #         arr_coupon_trigger = arr_feat[:idx_recall+1, 1]
-    #         arr_coupon = arr_feat[:idx_recall+1, 2]
-    #     else:
-    #         arr_coupon_trigger = arr_feat[:, 1]
-    #         arr_coupon = arr_feat[:, 2]           
-
-    #     if memory:
-    #         # First Payment
-    #         arr_paid_coupon[0] = arr_coupon[0] if arr_obs[0] >= arr_coupon_trigger[0] else 0
-
-    #         # Other payments, if any
-    #         if idx_recall > 0:
-    #             for i in range(1, len(arr_coupon_trigger)):
-    #                 if arr_obs[i] >= arr_coupon_trigger[i]:
-    #                     arr_paid_coupon[i] = sum(arr_coupon[:i]) - sum(arr_paid_coupon[:i-1])
-    #                 else:
-    #                     arr_paid_coupon[i] = 0
-
-    #     else:
-    #         for i in range(len(arr_coupon_trigger)):
-    #             if arr_obs[i] >= arr_coupon_trigger[i]:
-    #                 arr_paid_coupon[i] = arr_coupon[i]
-    #             else:
-    #                 arr_paid_coupon[i] = 0
-
-    #     # Pre combining the cashflows together
-    #     arr_cashflows = arr_paid_coupon
-
-    #     # Scenarii at maturity
-    #     if idx_recall == len(arr_feat.shape[0]) - 1:
-            
-    #         # (Capped) Upside Participation
-    #         upside = arr_call[1] * min(max(arr_obs[-1] - arr_call[0], 0), arr_call[2])
-
-    #         # Downside protection
-    #         if put_obs == "AMERICAN":
-    #             ind_pdi = min_val <= arr_put[1]
-    #         else:
-    #             ind_pdi = arr_obs[-1] <= arr_put[-1]
-            
-    #         pdi = ind_pdi * max(arr_put[0] - arr_put[2] * arr_obs[-1], 0)
-
-    #         # Considering capital protection, and barrier activation
-    #         capital = max(arr_put[3], 1 - pdi) * ind_pdi + (1-ind_pdi) * 1 
-
-    #         # Adding the final performances if the product lives up until maturity
-    #         arr_cashflows[-1] += upside + capital
-        
-    #     else:
-    #         arr_cashflows[-1] += 1          # Capital added in case of recall
-
-    #     return arr_cashflows, idx_recall, ind_pdi
+   
 
 
 
