@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO)
 
-from src.structools.products.basic_products import Basket
+from src.structools.products.basic_products import Underlying, Basket
 
 def app():
 
@@ -81,8 +81,7 @@ def app():
         
         # Generating the product
         if undl_type == "Basket":
-            logging.info((edited_df["Weights"]))
-            undl = Basket().from_params(size=1_000_000,
+            undl = Basket.from_params(size=1_000_000,
                                         name=basket_name,
                                         N=NOF,
                                         worst=worst,
@@ -91,5 +90,6 @@ def app():
                                         weights=edited_df["Weights"].astype(float).values
             )
 
+            st.text(isinstance(undl, Underlying))
             st.session_state.dict_undl.update({basket_name: undl})
             st.success(f"Underlying {basket_name} successfully created!")

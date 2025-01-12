@@ -28,9 +28,26 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
+my_basket_2 = Basket.from_params(
+    size = 1_000,
+    N=1,
+    name="Other Basket",
+    worst=True,
+    best=False,
+    compo=l_compo,
+    weights=arr_weights
+)
+
+print(type(my_basket))
+print(isinstance(my_basket, Underlying))
 print(my_basket)
 
-# my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
+my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
+print(my_phoenix.underlying.name)
+my_phoenix.set_parameter("underlying", my_basket_2)
+print(my_phoenix.underlying.name)
+
+
 # start = DateModel(date="2000-01-01")
 # end = DateModel(date=date.today())
 # my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity)
