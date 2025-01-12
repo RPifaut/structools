@@ -7,6 +7,7 @@ def run_app():
 
     st.set_page_config(
         page_title="Structools",
+        layout="wide"
     )
 
     # Sidebar configuration
