@@ -1,6 +1,22 @@
 # CHANGELOG
 
 
+## v0.16.0 (2025-01-12)
+
+### Bug Fixes
+
+- Creation of the page allowing for underlying construction
+  ([`72789ca`](https://github.com/RPifaut/structools/commit/72789ca0bd37721b433d38dad0e46dcee2bd7529))
+
+### Features
+
+- Developing web interface
+  ([`55eaf06`](https://github.com/RPifaut/structools/commit/55eaf0611ac111deb23f0baefa9eff8cf5820612))
+
+- Added the function to display the results and finalise the backtest
+  ([`968cbf3`](https://github.com/RPifaut/structools/commit/968cbf3cf894635263a1d0224c218e68c084efc3))
+
+
 ## v0.15.2 (2025-01-11)
 
 ### Bug Fixes
