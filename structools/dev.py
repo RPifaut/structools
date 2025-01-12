@@ -28,12 +28,14 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
-my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
-start = DateModel(date="2000-01-01")
-end = DateModel(date=date.today())
-my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity)
-res = my_bt.backtest_autocall()
-print(res)
+print(my_basket)
+
+# my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
+# start = DateModel(date="2000-01-01")
+# end = DateModel(date=date.today())
+# my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity)
+# res = my_bt.backtest_autocall()
+# print(res)
 # print(my_bt.market)
 # df_ret = my_bt.product.underlying.compute_return_compo(start, end, True, market = my_bt.market)
 # df_track = my_bt.product.underlying.build_track(start, end, df_ret)[my_basket.name]

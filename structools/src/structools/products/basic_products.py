@@ -88,7 +88,11 @@ class Underlying(BaseModel):
 
         return self
 
+    @classmethod
+    def from_params(self, *args, **kwargs):
 
+        pass
+    
     def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None):
 
         pass

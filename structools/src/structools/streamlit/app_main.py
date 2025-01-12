@@ -12,10 +12,10 @@ def run_app():
     # Sidebar configuration
     st.sidebar.title("Structools")
     st.sidebar.header("Navigation:")
-    page = st.sidebar.radio("Go to", ["Home", "Underlying Builder", "Product Builder", "Backtester"])
+    page = st.sidebar.radio("Go to", ["Test", "Underlying Builder", "Product Builder", "Backtester"])
 
     # Render selected page
-    if page == "Home":
+    if page == "Test":
         home.app()
 
     elif page == "Underlying Builder":
