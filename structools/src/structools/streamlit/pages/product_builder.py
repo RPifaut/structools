@@ -2,7 +2,7 @@ import streamlit as st
 from datetime import datetime as dt
 import numpy as np
 
-from src.structools.products.autocalls import Underlying, Athena, Phoenix, L_OBS_PUT
+from src.structools.products.autocalls import Underlying, Autocall, Athena, Phoenix, L_OBS_PUT
 from src.structools.products.autocalls import L_CCY
 from src.structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, DateModel
 
@@ -57,7 +57,8 @@ def app():
                             The list of underlying is empty!
                             Create your first underlying!
                             """)
-            
+            underlying = st.session_state.dict_undl[undl]
+            st.text(isinstance(underlying, Underlying))
         with col2:
             currency = st.selectbox(label="Select currency", 
                         options=L_CCY)
@@ -155,7 +156,7 @@ def app():
                                        value=99999.0,
                                        min_value=0.0,
                                        step=1.0)
-            st.caption("Cap = Maximum payoff / Max Performance")
+            st.caption("Cap = Maximum Payoff / Max Performance")
 
 
     # Downside protection features
@@ -252,5 +253,6 @@ def app():
                 kg=kg/100
             )
 
+        st.text(isinstance(product, Autocall))
         st.session_state.dict_prod.update({prod_name : product})
         st.success("Product successfully created!")

@@ -188,10 +188,10 @@ def display_results(df_track : pd.DataFrame, arr_cf : np.ndarray, arr_idx_recall
         "Average": arr_irr.mean(),
         "25% Percentile": np.percentile(arr_irr, 25),
         "Median": np.percentile(arr_irr, 50), 
-        "75%": np.percentile(arr_irr, 75)
+        "75% Percentile": np.percentile(arr_irr, 75)
     }
 
-    dict_res.update({"IRR Stats:": dict_irr_stats})
+    dict_res.update({"IRR Stats": dict_irr_stats})
 
     return dict_res
 
@@ -487,14 +487,18 @@ class Backtester(BaseModel):
                                                                  prod.put_barrier_observ,
                                                                  mat_obs_perf)
         
-        print(arr_cf)
-        print(arr_idx_recall)
         # Preparing the results
         dict_res = display_results(df_track,
                                    arr_cf,
                                    arr_idx_recall,
                                    arr_ind_pdi,
                                    mat_dates)  
-
+        dict_res.update({"Product": prod})
+        dict_data = {
+            "Observations": mat_obs,
+            "Dates": mat_dates,
+            "Cashflows": arr_cf
+        }
+        dict_res.update({"Data": dict_data})
         logging.info("Backtest completed!")
         return dict_res      
