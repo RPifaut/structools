@@ -13,6 +13,7 @@ logging.basicConfig(level=logging.INFO)
 
 # List with the possible type of observation for the put
 L_OBS_PUT = ["EUROPEAN", "AMERICAN"]
+L_CCY = ["EUR", "USD", "GBP", "CHF", "CHF", "SEK", "NOK", "AUD"]
 
 # Default objects
 
