@@ -1,6 +1,16 @@
 # CHANGELOG
 
 
+## v0.17.0 (2025-01-12)
+
+### Features
+
+- Backtester Operational
+  ([`b81e35c`](https://github.com/RPifaut/structools/commit/b81e35ccabdd0b157c22f4cdf60f3fd32dd0746b))
+
+BERAKING CHANGE: Backtester Operational
+
+
 ## v0.16.1 (2025-01-12)
 
 ### Bug Fixes
