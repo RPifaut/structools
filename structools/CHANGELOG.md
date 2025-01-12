@@ -1,6 +1,20 @@
 # CHANGELOG
 
 
+## v0.16.1 (2025-01-12)
+
+### Bug Fixes
+
+- Finished creating the GUI for the products creation
+  ([`2d672f5`](https://github.com/RPifaut/structools/commit/2d672f5c579eb9cbdec538b01c45f3a737a144cb))
+
+- Adding list of valid currencies
+  ([`17e4b7b`](https://github.com/RPifaut/structools/commit/17e4b7b29be745ab2886e4bfa52695a763bfff36))
+
+- Started working on the Product builder
+  ([`988f718`](https://github.com/RPifaut/structools/commit/988f71865495ede8eacd63d9da8894663595d8c5))
+
+
 ## v0.16.0 (2025-01-12)
 
 ### Bug Fixes
