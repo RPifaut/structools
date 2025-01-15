@@ -6,7 +6,7 @@ from src.structools.products.basic_products import Underlying
 File containing default parameters for the tests
 """
 
-START_DATE = DateModel(date="2000-10-22")
+START_DATE = DateModel(date="2001-10-22")
 END_DATE = DateModel(date="2024-10-22")
 
 L_COMPO = ["AAPL", "MSFT", "^FCHI", "^SPX"]

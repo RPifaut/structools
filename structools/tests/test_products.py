@@ -2,8 +2,10 @@ import pytest
 import copy
 import numpy as np
 from pydantic import ValidationError
+import plotly.graph_objects as go
 
 from tests.params import *
+from src.structools.tools.market import Market
 from src.structools.products.autocalls import Autocall, Athena, Phoenix
 from src.structools.products.basic_products import Underlying, Basket
 
@@ -38,14 +40,39 @@ def test_basket_return_computation():
     basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=False,
                                     N=1, compo=L_COMPO, weights=WEIGHTS)
     
+    df_ret = basket.compute_return_compo(start_date=START_DATE, end_date=END_DATE)
+    assert df_ret.shape[1] == 4
+    assert df_ret.shape[0] == 4562
+
+def test_basket_track():
+
+    basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=False,
+                                    N=1, compo=L_COMPO, weights=WEIGHTS)
     
+    # Without df_ret_compo passed as argument
+    df_track = basket.build_track(START_DATE, END_DATE)
+    assert df_track.shape[1] == 2
+    assert df_track.shape[0] == 4562
 
+    # With the df_ret passed as an argument
+    df_ret = basket.compute_return_compo(START_DATE, END_DATE)
+    df_track = basket.build_track(START_DATE, END_DATE, df_ret)
+    assert df_track.shape[1] == 2
+    assert df_track.shape[0] == 4562
 
+def test_plot():
 
+    basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=False,
+                                    N=1, compo=L_COMPO, weights=WEIGHTS)
+    
+    # Without any initial data
+    fig = basket.plot_track(START_DATE, END_DATE)
+    assert isinstance(fig, go.Figure)
 
-
-
-
+    # With df_track passed
+    df_track = basket.build_track(START_DATE, END_DATE)
+    fig = basket.plot_track(START_DATE, END_DATE, df_track=df_track)
+    assert isinstance(fig, go.Figure)
 
 
 
