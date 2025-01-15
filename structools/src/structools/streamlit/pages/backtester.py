@@ -68,8 +68,8 @@ def app():
                                         max_value=20,
                                         step=1)
             
-        st.text(f"Correct type: {isinstance(product, Autocall)}")
-        st.text(f"Correct type: {isinstance(underlying, Underlying)}")
+        st.text(f"Correct type product: {isinstance(product, Autocall)}")
+        st.text(f"Correct type underlying: {isinstance(underlying, Underlying)}")
 
         if st.button(label="Run Backtest"):
             
