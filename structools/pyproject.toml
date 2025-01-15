@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "structools"
-version = "0.17.11"
+version = "0.17.12"
 description = ": Helpful tools for QIS and Pricing Structuring teams"
 authors = ["Romain Pifaut"]
 license = "MIT"

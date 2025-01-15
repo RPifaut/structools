@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.12 (2025-01-15)
+
+### Bug Fixes
+
+- Correcting typo in README
+  ([`586412f`](https://github.com/RPifaut/structools/commit/586412f6e6cc44166a06ea378dd89e1181f386a2))
+
+
 ## v0.17.11 (2025-01-15)
 
 ### Bug Fixes
