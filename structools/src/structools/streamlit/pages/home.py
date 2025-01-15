@@ -30,4 +30,13 @@ def app():
     st.text("Please use the side bar on the left to navigate through the tool!")
     st.text("Happy backtesting!")
 
-        
+    st.markdown('''
+            
+            READ BEFORE USE:
+            You may have to create several underlyings/products to make sure they are valid. Please make sure that:
+            - The underlying type is True in the Product Builder.
+            - Both the product and underlying types are True in the Backtester.
+
+            If not, please select another one, or simply create a new underlying/product.
+  
+            ''')

@@ -73,6 +73,7 @@ def app():
             columns=["Tickers", "Weights"]
         )
         edited_df = st.data_editor(df_compo, use_container_width=True)
+        st.caption("Please make sure you enter valid YahooFinance tickers! URL: https://fr.finance.yahoo.com")
 
     # Underlying validation
     st.markdown('-----')
@@ -90,6 +91,5 @@ def app():
                                         weights=edited_df["Weights"].astype(float).values
             )
 
-            st.text(isinstance(undl, Underlying))
             st.session_state.dict_undl.update({basket_name: undl})
             st.success(f"Underlying {basket_name} successfully created!")
