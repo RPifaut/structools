@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.10 (2025-01-15)
+
+### Bug Fixes
+
+- Edting README.md file
+  ([`696e500`](https://github.com/RPifaut/structools/commit/696e500c01dfbadb9e4b2c3375512601b1bde8a0))
+
+
 ## v0.17.9 (2025-01-15)
 
 ### Bug Fixes
