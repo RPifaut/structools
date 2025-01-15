@@ -7,7 +7,6 @@ from typing import List, Union, ClassVar
 from pydantic import BaseModel, Field
 from dateutil.relativedelta import relativedelta
 from scipy.optimize import newton
-from numba import jit, prange
 
 from structools.tools.market import Market, ACT
 from structools.tools.date_tools import DateModel, find_dates_index, DICT_MATCH_FREQ
