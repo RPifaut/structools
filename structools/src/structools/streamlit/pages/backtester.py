@@ -38,21 +38,28 @@ def app():
         with col1:
             product = st.selectbox(label="Select a product to backtest",
                                    options = list(st.session_state.dict_prod.keys()))
-            product=st.session_state.dict_prod[product]
             if len(list(st.session_state.dict_prod.keys())) == 0:
                 st.warning("""
                             The list of products is empty!
                             Create your first underlying!
                             """)
+                
+            if len(st.session_state.dict_prod.keys()) != 0:
+                product=st.session_state.dict_prod[product]
+
         with col2:
             underlying = st.selectbox(label="Select an underlying",
                                       options=list(st.session_state.dict_undl.keys()))
-            underlying = st.session_state.dict_undl[underlying]
             if len(list(st.session_state.dict_undl.keys())) == 0:
                 st.warning("""
                             The list of products is empty!
                             Create your first underlying!
                             """)
+
+            if len(st.session_state.dict_undl.keys()) != 0:
+                underlying = st.session_state.dict_undl[underlying]
+        
+
                 
         with col3:
             bt_length = st.number_input(label="Backtest duration (years)",
@@ -61,8 +68,8 @@ def app():
                                         max_value=20,
                                         step=1)
             
-        st.text(isinstance(product, Autocall))
-        st.text(isinstance(underlying, Underlying))
+        st.text(f"Correct type: {isinstance(product, Autocall)}")
+        st.text(f"Correct type: {isinstance(underlying, Underlying)}")
 
         if st.button(label="Run Backtest"):
             

@@ -57,8 +57,10 @@ def app():
                             The list of underlying is empty!
                             Create your first underlying!
                             """)
-            underlying = st.session_state.dict_undl[undl]
-            st.text(isinstance(underlying, Underlying))
+            if len(st.session_state.dict_undl.keys()) != 0:
+                underlying = st.session_state.dict_undl[undl]
+                st.text(f"Correct type: {isinstance(underlying, Underlying)}")
+
         with col2:
             currency = st.selectbox(label="Select currency", 
                         options=L_CCY)
