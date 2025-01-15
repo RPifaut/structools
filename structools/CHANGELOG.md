@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.7 (2025-01-15)
+
+### Bug Fixes
+
+- Test upload
+  ([`82e0c22`](https://github.com/RPifaut/structools/commit/82e0c220f58f05749be43338b8f4c14e98b0dbc7))
+
+
 ## v0.17.6 (2025-01-15)
 
 ### Bug Fixes
