@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.11 (2025-01-15)
+
+### Bug Fixes
+
+- Final touch to the README + Streamlit Explanations
+  ([`b530bee`](https://github.com/RPifaut/structools/commit/b530beeb3a1550585cd85e3369107e72fb277c77))
+
+
 ## v0.17.10 (2025-01-15)
 
 ### Bug Fixes
