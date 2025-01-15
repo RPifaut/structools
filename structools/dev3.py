@@ -1,4 +1,4 @@
-from src.structools.streamlit.app_main import run_app
+from src.structools.launch import start
 
 if __name__ == "__main__":
-    run_app()
+    start()
