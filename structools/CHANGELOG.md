@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.9 (2025-01-15)
+
+### Bug Fixes
+
+- Quick fix regarding numba unsed import
+  ([`47fd16d`](https://github.com/RPifaut/structools/commit/47fd16d807eb3ce3d9b074b7081efdc7323edad6))
+
+
 ## v0.17.8 (2025-01-15)
 
 ### Bug Fixes
