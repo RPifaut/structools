@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.4 (2025-01-15)
+
+### Bug Fixes
+
+- Added App launch file + updated dependencies
+  ([`e3ac6b7`](https://github.com/RPifaut/structools/commit/e3ac6b739ac2a4e0f9e2988e82a1bb35f1034391))
+
+
 ## v0.17.3 (2025-01-15)
 
 ### Bug Fixes
