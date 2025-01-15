@@ -10,7 +10,25 @@ $ pip install structools
 
 ## Usage
 
-- TODO
+Every new functionality developed in this package has been interfaced so you have very little to do!
+
+Start by creating a file launch.py with the following lines
+
+```python
+from structools.launch import start
+
+if __name__ == "__main__":
+
+    start()
+```
+
+Then open the terminal in the folder where the file launch.py is located and simply run the following command
+
+```bash
+$ streamlit run launch.py
+```
+
+Welcome to Structools!
 
 ## Contributing
 

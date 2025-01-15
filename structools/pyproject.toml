@@ -15,6 +15,7 @@ numpy = "1.26.0"
 pybacktestchain = "^0.2.1"
 streamlit = "^1.41.1"
 pytest = "^8.3.4"
+openpyxl = "^3.1.5"
 
 [tool.poetry.dev-dependencies]
 
