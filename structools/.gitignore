@@ -143,3 +143,6 @@ dmypy.json
 
 # Excel and other data files
 *.xlsx
+
+# Jupyter Notebooks
+*.ipynb
