@@ -53,6 +53,7 @@ basket_wof = Basket.from_params(
     name="WOF2",
     worst=True,
     best=False,
+    compo=L_COMPO,
     weights=arr_weights
 )
 
@@ -69,7 +70,7 @@ backtester = Backtester.init_backtester(
 )
 
 # Running the backtest
-dict_res = backtester.backtester_autocall()
+dict_res = backtester.backtest_autocall()
 ```
 
 

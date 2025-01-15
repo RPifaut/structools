@@ -1,74 +1,35 @@
-import streamlit as st
-from src.structools.streamlit.pages import page_2, page_3
-import pandas as pd
+import numpy as np
+from structools.tools.date_tools import DateModel
+from structools.products.basic_products import Basket
+from structools.products.autocalls import Phoenix, Athena
+from structools.backtest.backtester import Backtester
 
-def display_name(name : str):
-    st.write(f"Hello: {name}")
+# Underlying creation Worst-Of 2
+nominal = 1_000_000
+L_COMPO = ["AAPL", "^FCHI", "^SPX", "MSFT"]
+N = len(L_COMPO)
+arr_weights = np.ones(N) * 1/N
+basket_wof = Basket.from_params(
+    size=nominal,
+    N=2,
+    name="WOF2",
+    worst=True,
+    best=False,
+    compo=L_COMPO,
+    weights=arr_weights
+)
 
+# Create default phoenix with custom underlying
+my_phoenix = Phoenix.from_params(underlying=basket_wof)
+my_phoenix.set_parameter("coupon", 0.1)                 # Changing the coupon value to 10%
 
-def run_app():
+# Configure the backtest - 10 years history for the my_phoenix product
+history_length = 10
+backtester = Backtester.init_backtester(
+    product=my_phoenix,
+    backtest_length=history_length,
+    investment_horizon=my_phoenix.maturity
+)
 
-    st.title("Streamlit App")
-    st.write("This is a Streamlit app module")
-
-    df = pd.DataFrame({
-        'first column': [1, 2, 3, 4],
-        'second column': [10, 20, 30, 40]
-    })
-
-    st.table(df)
-
-    x = st.slider('x') 
-    st.write(x, 'squared is', x * x)
-    
-    name = st.text_input("Your name", "name")
-
-    if st.button("Say Hello"):
-        if name:
-            display_name(name)
-        else:
-            st.warning("Please enter your name")
-
-    df = pd.DataFrame({
-        'first column': [1, 2, 3, 4],
-        'second column': [10, 20, 30, 40]
-        })
-
-    option = st.selectbox(
-        'Which number do you like best?',
-        df['first column'])
-    
-    st.write(f"You selected {option}")
-
-    # Add a selectbox to the sidebar:
-    add_selectbox = st.sidebar.selectbox(
-        'How would you like to be contacted?',
-        ('Email', 'Home phone', 'Mobile phone')
-    )
-
-    st.sidebar.write(f"Your selection: {add_selectbox}")
-
-    # Add a slider to the sidebar:
-    add_slider = st.sidebar.slider(
-        'Select a range of values',
-        0.0, 100.0, (25.0, 75.0)
-    )
-
-    left_column, right_column = st.columns(2)
-
-
-    # You can use a column just like st.sidebar:
-    left_column.button('Press me!')
-
-    # Or even better, call Streamlit functions inside a "with" block:
-    with right_column:
-        chosen = st.radio(
-            'Sorting hat',
-            ("Gryffindor", "Ravenclaw", "Hufflepuff", "Slytherin"))
-        st.write(f"You are in {chosen} house!")
-
-
-
-if __name__ == "__main__":
-
-    run_app()
+# Running the backtest
+dict_res = backtester.backtest_autocall()
