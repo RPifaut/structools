@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.1 (2025-01-15)
+
+### Bug Fixes
+
+- Adding tests for the products and markets
+  ([`fb8dffc`](https://github.com/RPifaut/structools/commit/fb8dffc12e2c6d4208a60f95f8e5acaa8406f8ad))
+
+
 ## v0.17.0 (2025-01-12)
 
 ### Features
