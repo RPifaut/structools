@@ -1,6 +1,6 @@
 # structools
 
-: Helpful tools for QIS and Pricing Structuring teams
+Helpful tools for QIS and Pricing Structuring teams
 
 ## Installation
 
