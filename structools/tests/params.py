@@ -1,6 +1,6 @@
 import numpy as np
 from src.structools.tools.date_tools import DateModel
-from src.structools.products.basic_products import Underlying
+from src.structools.products.basic_products import Underlying, Basket
 
 """
 File containing default parameters for the tests
@@ -12,6 +12,15 @@ END_DATE = DateModel(date="2024-10-22")
 L_COMPO = ["AAPL", "MSFT", "^FCHI", "^SPX"]
 WEIGHTS = np.array([0.25, 0.25, 0.25, 0.25])
 N = 1
+
+BASKET = Basket.from_params(size=1_000_000,
+                            name="Custom Basket",
+                            worst=False,
+                            best=False,
+                            N=1,
+                            compo=L_COMPO,
+                            weights=WEIGHTS)
+
 
 # Autocall Params
 UNDL = Underlying()

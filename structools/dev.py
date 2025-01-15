@@ -13,6 +13,7 @@ from src.structools.products.autocalls import Autocall, Phoenix, Athena
 from src.structools.backtest.backtester import Backtester, get_all_observations, mono_path_backtest, all_paths_backtest
 from src.structools.tools.date_tools import DateModel
 from src.structools.tools.market import Market, load_stocks_data
+from tests.params import *
 
 
 
@@ -35,17 +36,43 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
-print(isinstance(my_basket, Underlying))
+# print(isinstance(my_basket, Underlying))
 
-start = DateModel(date="2001-10-22")
-end = DateModel(date="2024-10-22")
-df_ret = my_basket.compute_return_compo(start, end)
-df_track = my_basket.build_track(start, end)
-print(df_track)
-print(df_track.shape)
-# my_bt = Backtester.init_backtester(my_phoenix, 10, my_phoenix.maturity)
-# res = my_bt.backtest_autocall()
-# print(res)
+# start = DateModel(date="2001-10-22")
+# end = DateModel(date="2024-10-22")
+# df_ret = my_basket.compute_return_compo(start, end)
+# df_track = my_basket.build_track(start, end)
+# print(df_track)
+# print(df_track.shape)
+
+# Backtesting Athena - Phoenix
+dict_athena = DICT_ATHENA.copy()
+dict_athena["underlying"] = BASKET
+athena = Athena.from_params(**dict_athena)
+bt_athena = Backtester.init_backtester(product=athena, backtest_length=10, 
+                                        investment_horizon=athena.maturity)
+dict_phoenix = DICT_PHOENIX.copy()
+dict_phoenix["maturity"] = 5
+dict_phoenix["underlying"] = BASKET
+phoenix = Phoenix.from_params(**dict_phoenix)
+bt_phoenix = Backtester.init_backtester(product=phoenix, backtest_length=10, 
+                                        investment_horizon=phoenix.maturity)
+
+# Assert correct instantiation
+print(isinstance(bt_athena, Backtester))
+print(isinstance(bt_phoenix, Backtester))
+
+# Assert correct results
+res_athena = bt_athena.backtest_autocall()
+res_phoenix = bt_phoenix.backtest_autocall()
+
+print(res_athena["Number of trajectories"])
+print(res_phoenix["Number of trajectories"])
+print(res_athena["Recall Probabilities"].shape[1])
+print(res_phoenix["Recall Probabilities"].shape[1])
+print(isinstance(res_athena["Underlying Track"], pd.Series))
+
+
 # print(my_bt.market)
 # df_ret = my_bt.product.underlying.compute_return_compo(start, end, True, market = my_bt.market)
 # df_track = my_bt.product.underlying.build_track(start, end, df_ret)[my_basket.name]
