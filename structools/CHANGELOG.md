@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.6 (2025-01-15)
+
+### Bug Fixes
+
+- Adding pytest to the dependencies
+  ([`aa39b98`](https://github.com/RPifaut/structools/commit/aa39b98e1492afebefb24aa8e0da2b9de0e401db))
+
+
 ## v0.17.5 (2025-01-15)
 
 ### Bug Fixes
