@@ -58,7 +58,7 @@ basket_wof = Basket.from_params(
 
 # Create default phoenix with custom underlying
 my_phoenix = Phoenix.from_params(underlying=basket_wof)
-my_phoenix.set_parameter("coupon", 0.1)                 # Changing the coupon value to 10
+my_phoenix.set_parameter("coupon", 0.1)                 # Changing the coupon value to 10%
 
 # Configure the backtest - 10 years history for the my_phoenix product
 history_length = 10
