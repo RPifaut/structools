@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.8 (2025-01-15)
+
+### Bug Fixes
+
+- Update PyPI package
+  ([`8cf8dcc`](https://github.com/RPifaut/structools/commit/8cf8dccabb6eaac7182f0b62329f82b6b7b57d22))
+
+
 ## v0.17.7 (2025-01-15)
 
 ### Bug Fixes
