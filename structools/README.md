@@ -40,7 +40,7 @@ import numpy as np
 from structools.tools.date_tools import DateModel
 from structools.products.basic_products import Basket
 from structools.products.autocalls import Phoenix, Athena
-from src.structools.backtest.backtester import Backtester
+from structools.backtest.backtester import Backtester
 
 # Underlying creation Worst-Of 2
 nominal = 1_000_000
