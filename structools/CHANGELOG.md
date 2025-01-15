@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.17.3 (2025-01-15)
+
+### Bug Fixes
+
+- Starting the testing of the backtester
+  ([`11d909f`](https://github.com/RPifaut/structools/commit/11d909ff7b4f071a4904aa142f7bc0fd797904d8))
+
+- Working on dependencies
+  ([`994693b`](https://github.com/RPifaut/structools/commit/994693bcab762af19707cb0360cf5dd2f5f6327d))
+
+
 ## v0.17.2 (2025-01-15)
 
 ### Bug Fixes
@@ -31,11 +42,11 @@ BERAKING CHANGE: Backtester Operational
 
 ### Bug Fixes
 
-- Finished creating the GUI for the products creation
-  ([`2d672f5`](https://github.com/RPifaut/structools/commit/2d672f5c579eb9cbdec538b01c45f3a737a144cb))
-
 - Adding list of valid currencies
   ([`17e4b7b`](https://github.com/RPifaut/structools/commit/17e4b7b29be745ab2886e4bfa52695a763bfff36))
+
+- Finished creating the GUI for the products creation
+  ([`2d672f5`](https://github.com/RPifaut/structools/commit/2d672f5c579eb9cbdec538b01c45f3a737a144cb))
 
 - Started working on the Product builder
   ([`988f718`](https://github.com/RPifaut/structools/commit/988f71865495ede8eacd63d9da8894663595d8c5))
@@ -50,11 +61,11 @@ BERAKING CHANGE: Backtester Operational
 
 ### Features
 
-- Developing web interface
-  ([`55eaf06`](https://github.com/RPifaut/structools/commit/55eaf0611ac111deb23f0baefa9eff8cf5820612))
-
 - Added the function to display the results and finalise the backtest
   ([`968cbf3`](https://github.com/RPifaut/structools/commit/968cbf3cf894635263a1d0224c218e68c084efc3))
+
+- Developing web interface
+  ([`55eaf06`](https://github.com/RPifaut/structools/commit/55eaf0611ac111deb23f0baefa9eff8cf5820612))
 
 
 ## v0.15.2 (2025-01-11)
@@ -168,22 +179,22 @@ BERAKING CHANGE: Backtester Operational
 
 ### Features
 
-- To be tester: finished autocall backtester
-  ([`fe38f5a`](https://github.com/RPifaut/structools/commit/fe38f5a2e236e39f97c30ee7c0383511e098d0f1))
-
 - Adding unsaved lines
   ([`18d92ad`](https://github.com/RPifaut/structools/commit/18d92ad9bb273ef435cb01bed654c47643237586))
+
+- To be tester: finished autocall backtester
+  ([`fe38f5a`](https://github.com/RPifaut/structools/commit/fe38f5a2e236e39f97c30ee7c0383511e098d0f1))
 
 
 ## v0.9.0 (2024-12-05)
 
 ### Features
 
-- Progress on autocall backtester + IRR computaion function
-  ([`894e745`](https://github.com/RPifaut/structools/commit/894e745460e40734ac8e82ac5848d5a7bd099aa0))
-
 - Advanced on the Autocall backtester
   ([`69db4de`](https://github.com/RPifaut/structools/commit/69db4de832777d9e26fb870671f3d7dc040fffdd))
+
+- Progress on autocall backtester + IRR computaion function
+  ([`894e745`](https://github.com/RPifaut/structools/commit/894e745460e40734ac8e82ac5848d5a7bd099aa0))
 
 
 ## v0.8.0 (2024-12-03)
@@ -206,11 +217,11 @@ BERAKING CHANGE: Backtester Operational
 
 ### Features
 
-- Addition of the Backtester class
-  ([`ccd7e23`](https://github.com/RPifaut/structools/commit/ccd7e233dd897faeaa3ebac432da0dee9bd7ab4b))
-
 - Adding the Market class
   ([`1a1260e`](https://github.com/RPifaut/structools/commit/1a1260e57e0e04fcfdcbd05251e217e343e84c06))
+
+- Addition of the Backtester class
+  ([`ccd7e23`](https://github.com/RPifaut/structools/commit/ccd7e233dd897faeaa3ebac432da0dee9bd7ab4b))
 
 
 ## v0.5.0 (2024-12-01)
