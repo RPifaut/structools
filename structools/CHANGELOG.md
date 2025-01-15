@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.2 (2025-01-15)
+
+### Bug Fixes
+
+- Added basket returns and track tests
+  ([`d2d7dc9`](https://github.com/RPifaut/structools/commit/d2d7dc9409d6aed02931cd276a65097849ad0753))
+
+
 ## v0.17.1 (2025-01-15)
 
 ### Bug Fixes
