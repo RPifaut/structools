@@ -1,6 +1,17 @@
 # CHANGELOG
 
 
+## v0.17.5 (2025-01-15)
+
+### Bug Fixes
+
+- Added finished test for backtest computation
+  ([`e1ffff3`](https://github.com/RPifaut/structools/commit/e1ffff314907e5f270cc6ccedb08119f652428da))
+
+- Few modifications in the display of the streamlit interface
+  ([`2dcd706`](https://github.com/RPifaut/structools/commit/2dcd706ae7de5b1d4e9ad99d55ac136df3ee7a2c))
+
+
 ## v0.17.4 (2025-01-15)
 
 ### Bug Fixes
