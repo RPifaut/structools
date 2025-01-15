@@ -6,10 +6,10 @@ from pydantic import ValidationError
 import plotly.graph_objects as go
 
 from tests.params import *
-from src.structools.tools.market import Market
-from src.structools.products.autocalls import Autocall, Athena, Phoenix
-from src.structools.products.basic_products import Underlying, Basket
-from src.structools.backtest.backtester import Backtester
+from structools.tools.market import Market
+from structools.products.autocalls import Autocall, Athena, Phoenix
+from structools.products.basic_products import Underlying, Basket
+from structools.backtest.backtester import Backtester
 
 def test_backtester():
 

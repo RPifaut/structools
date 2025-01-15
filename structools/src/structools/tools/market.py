@@ -3,7 +3,7 @@ import numpy as np
 import logging
 from pydantic import BaseModel, Field
 from typing import List, Dict
-from src.structools.tools.date_tools import DateModel
+from structools.tools.date_tools import DateModel
 from pybacktestchain.data_module import DataModule, get_stocks_data
 
 logging.basicConfig(level=logging.INFO)

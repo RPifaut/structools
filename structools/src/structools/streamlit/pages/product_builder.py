@@ -2,9 +2,9 @@ import streamlit as st
 from datetime import datetime as dt
 import numpy as np
 
-from src.structools.products.autocalls import Underlying, Autocall, Athena, Phoenix, L_OBS_PUT
-from src.structools.products.autocalls import L_CCY
-from src.structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, DateModel
+from structools.products.autocalls import Underlying, Autocall, Athena, Phoenix, L_OBS_PUT
+from structools.products.autocalls import L_CCY
+from structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, DateModel
 
 L_PROD = ["Athena", "Phoenix"]
 

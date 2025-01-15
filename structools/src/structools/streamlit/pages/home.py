@@ -1,5 +1,5 @@
 import streamlit as st
-from src.structools.streamlit.pages import underlying_builder, backtester
+from structools.streamlit.pages import underlying_builder, backtester
 
 
 def app():

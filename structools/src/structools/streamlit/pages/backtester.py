@@ -7,10 +7,10 @@ import plotly.express as px
 from datetime import datetime as dt
 
 
-from src.structools.backtest.backtester import Backtester
-from src.structools.tools.date_tools import DateModel
-from src.structools.products.autocalls import Autocall
-from src.structools.products.basic_products import Underlying
+from structools.backtest.backtester import Backtester
+from structools.tools.date_tools import DateModel
+from structools.products.autocalls import Autocall
+from structools.products.basic_products import Underlying
 
 def app():
 

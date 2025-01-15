@@ -9,11 +9,11 @@ from dateutil.relativedelta import relativedelta
 from scipy.optimize import newton
 from numba import jit, prange
 
-from src.structools.tools.market import Market, ACT
-from src.structools.tools.date_tools import DateModel, find_dates_index, DICT_MATCH_FREQ
-from src.structools.tools.timer import timer
-from src.structools.products.autocalls import Autocall, Phoenix, Athena
-from src.structools.products.basic_products import Underlying
+from structools.tools.market import Market, ACT
+from structools.tools.date_tools import DateModel, find_dates_index, DICT_MATCH_FREQ
+from structools.tools.timer import timer
+from structools.products.autocalls import Autocall, Phoenix, Athena
+from structools.products.basic_products import Underlying
 
 
 logging.basicConfig(level=logging.INFO)

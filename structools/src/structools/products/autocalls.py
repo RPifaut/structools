@@ -4,9 +4,9 @@ from pydantic import BaseModel, field_validator, Field
 from datetime import date
 from typing import Union, Literal
 
-from src.structools.tools.date_tools import DateModel
-from src.structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, find_dates_index
-from src.structools.products.basic_products import Underlying
+from structools.tools.date_tools import DateModel
+from structools.tools.date_tools import L_FREQ, DICT_MATCH_FREQ, find_dates_index
+from structools.products.basic_products import Underlying
 
 import logging
 logging.basicConfig(level=logging.INFO)

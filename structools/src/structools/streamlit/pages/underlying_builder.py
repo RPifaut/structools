@@ -3,7 +3,7 @@ import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO)
 
-from src.structools.products.basic_products import Underlying, Basket
+from structools.products.basic_products import Underlying, Basket
 
 def app():
 

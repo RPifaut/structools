@@ -1,6 +1,6 @@
 import numpy as np
-from src.structools.tools.date_tools import DateModel
-from src.structools.products.basic_products import Underlying, Basket
+from structools.tools.date_tools import DateModel
+from structools.products.basic_products import Underlying, Basket
 
 """
 File containing default parameters for the tests

@@ -8,11 +8,19 @@ import openpyxl
 import matplotlib.pyplot as plt
 import plotly.express as px
 
-from src.structools.products.basic_products import Option, Underlying, Basket
-from src.structools.products.autocalls import Autocall, Phoenix, Athena
-from src.structools.backtest.backtester import Backtester, get_all_observations, mono_path_backtest, all_paths_backtest
-from src.structools.tools.date_tools import DateModel
-from src.structools.tools.market import Market, load_stocks_data
+from structools.products.basic_products import Option, Underlying, Basket
+from structools.products.autocalls import Autocall, Phoenix, Athena
+from structools.backtest.backtester import Backtester, get_all_observations, mono_path_backtest, all_paths_backtest
+from structools.tools.date_tools import DateModel
+from structools.tools.market import Market, load_stocks_data
+
+
+# from src.structools.products.basic_products import Option, Underlying, Basket
+# from src.structools.products.autocalls import Autocall, Phoenix, Athena
+# from src.structools.backtest.backtester import Backtester, get_all_observations, mono_path_backtest, all_paths_backtest
+# from src.structools.tools.date_tools import DateModel
+# from src.structools.tools.market import Market, load_stocks_data
+
 from tests.params import *
 
 
@@ -22,19 +30,19 @@ from tests.params import *
 # print(len(set(df_data["ticker"])))
 # print(df_data.shape[0])
 
-l_compo = ["AAPL", "^FCHI", "^SPX", "MSFT"]
-N = len(l_compo)
-arr_weights = np.ones(N) * 1/N
-# arr_weights = np.array([0.3, 0.3, 0.4])
-my_basket = Basket.from_params(
-    size = 1_000,
-    N=1,
-    name="EQW Basket",
-    worst=True,
-    best=False,
-    compo=l_compo,
-    weights=arr_weights
-)
+# l_compo = ["AAPL", "^FCHI", "^SPX", "MSFT"]
+# N = len(l_compo)
+# arr_weights = np.ones(N) * 1/N
+# # arr_weights = np.array([0.3, 0.3, 0.4])
+# my_basket = Basket.from_params(
+#     size = 1_000,
+#     N=1,
+#     name="EQW Basket",
+#     worst=True,
+#     best=False,
+#     compo=l_compo,
+#     weights=arr_weights
+# )
 
 # print(isinstance(my_basket, Underlying))
 
@@ -49,8 +57,15 @@ my_basket = Basket.from_params(
 dict_athena = DICT_ATHENA.copy()
 dict_athena["underlying"] = BASKET
 athena = Athena.from_params(**dict_athena)
+print(type(athena))
+print(isinstance(athena, Autocall))
+print(isinstance(athena.underlying, Underlying))
+print(athena.maturity)
 bt_athena = Backtester.init_backtester(product=athena, backtest_length=10, 
                                         investment_horizon=athena.maturity)
+
+print(athena.arr_recall_trigger)
+print(athena.underlying)
 dict_phoenix = DICT_PHOENIX.copy()
 dict_phoenix["maturity"] = 5
 dict_phoenix["underlying"] = BASKET

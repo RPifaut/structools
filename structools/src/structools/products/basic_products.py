@@ -5,8 +5,8 @@ import plotly.graph_objects as go
 import logging
 from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List
-from src.structools.tools.date_tools import DateModel
-from src.structools.tools.market import Market, L_PRICES
+from structools.tools.date_tools import DateModel
+from structools.tools.market import Market, L_PRICES
 
 logging.basicConfig(level=logging.INFO)
 

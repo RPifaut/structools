@@ -1,5 +1,5 @@
 import streamlit as st
-from src.structools.streamlit.pages import page_2, page_3
+from structools.streamlit.pages import page_2, page_3
 import pandas as pd
 
 def say_hello(name):

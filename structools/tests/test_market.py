@@ -1,7 +1,7 @@
 import pytest
 
-from src.structools.tools.market import Market, load_stocks_data
-from src.structools.tools.date_tools import DateModel
+from structools.tools.market import Market, load_stocks_data
+from structools.tools.date_tools import DateModel
 from tests.params import *
 
 def test_data_loading():
