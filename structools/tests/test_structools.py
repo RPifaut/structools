@@ -1,1 +1,0 @@
-from structools import structools

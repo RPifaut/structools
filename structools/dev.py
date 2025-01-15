@@ -9,15 +9,22 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 
 from src.structools.products.basic_products import Option, Underlying, Basket
-from src.structools.products.autocalls import Phoenix, Athena
+from src.structools.products.autocalls import Autocall, Phoenix, Athena
 from src.structools.backtest.backtester import Backtester, get_all_observations, mono_path_backtest, all_paths_backtest
 from src.structools.tools.date_tools import DateModel
 from src.structools.tools.market import Market, load_stocks_data
 
-l_compo = ["AAPL", "^FCHI", "^SPX"]
+
+
+# df_data = load_stocks_data(tickers=["AAPL", "MSFT", "^FCHI", "^SPX"], start_date=DateModel(date="2001-10-22"), end_date=DateModel(date="2024-10-22"))
+# print(df_data)
+# print(len(set(df_data["ticker"])))
+# print(df_data.shape[0])
+
+l_compo = ["AAPL", "^FCHI", "^SPX", "MSFT"]
 N = len(l_compo)
-# arr_weights = np.ones(N) * 1/N
-arr_weights = np.array([0.3, 0.3, 0.4])
+arr_weights = np.ones(N) * 1/N
+# arr_weights = np.array([0.3, 0.3, 0.4])
 my_basket = Basket.from_params(
     size = 1_000,
     N=1,
@@ -28,24 +35,26 @@ my_basket = Basket.from_params(
     weights=arr_weights
 )
 
-my_basket_2 = Basket.from_params(
-    size = 1_000,
-    N=1,
-    name="Other Basket",
-    worst=True,
-    best=False,
-    compo=l_compo,
-    weights=arr_weights
-)
-
-print(type(my_basket))
 print(isinstance(my_basket, Underlying))
-print(my_basket)
 
-my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
-print(my_phoenix.underlying.name)
-my_phoenix.set_parameter("underlying", my_basket_2)
-print(my_phoenix.underlying.name)
+# my_basket_2 = Basket.from_params(
+#     size = 1_000,
+#     N=1,
+#     name="Other Basket",
+#     worst=True,
+#     best=False,
+#     compo=l_compo,
+#     weights=arr_weights
+# )
+
+# print(type(my_basket))
+# print(isinstance(my_basket, Underlying))
+# print(my_basket)
+
+# my_phoenix = Athena.from_params(maturity=5, coupon=0.01, recall_freq="M", first_trigger = 1.1, underlying=my_basket, start_recall=12)
+# print(my_phoenix.underlying.name)
+# my_phoenix.set_parameter("underlying", my_basket_2)
+# print(my_phoenix.underlying.name)
 
 
 # start = DateModel(date="2000-01-01")

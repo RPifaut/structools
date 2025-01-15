@@ -73,13 +73,13 @@ class Autocall(BaseModel):
     # Recall features
     start_recall : int = Field(1, gt=0)
     recall_freq : str = "A"
-    first_trigger : float = Field(1.0, ge=1)
+    first_trigger : float = Field(1.0, gt=0)
     step_down : float = Field(0.0, ge=0)
 
 
     # Coupon features
     coupon : float = Field(0.05, ge=0)
-    coupon_trigger : float = Field(0.8, ge=0)
+    coupon_trigger : float = Field(0.8, gt=0)
     start_coupon : int = Field(1, ge=0)
     is_memory : bool = False
 
