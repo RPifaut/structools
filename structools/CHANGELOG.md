@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.19.1 (2025-01-17)
+
+### Bug Fixes
+
+- Adapting README and package dependencies for excel download
+  ([`7c783e7`](https://github.com/RPifaut/structools/commit/7c783e719176f22cafb8652440c8a082df2a9d19))
+
+
 ## v0.19.0 (2025-01-17)
 
 ### Features
