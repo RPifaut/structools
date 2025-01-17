@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.15 (2025-01-17)
+
+### Bug Fixes
+
+- Edit testfile backtest + easy to run tests for end users
+  ([`cc00614`](https://github.com/RPifaut/structools/commit/cc00614fcab61aa933808d136d9ec24946405cf9))
+
+
 ## v0.17.14 (2025-01-15)
 
 ### Bug Fixes
