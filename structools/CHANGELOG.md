@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.23 (2025-01-17)
+
+### Bug Fixes
+
+- Creating the Index section in straemlit. Backtesting Autocalls on custom indices is available
+  ([`1c64473`](https://github.com/RPifaut/structools/commit/1c64473b987cba7e8d6937cc34383fa9959cfee7))
+
+
 ## v0.17.22 (2025-01-17)
 
 ### Bug Fixes
