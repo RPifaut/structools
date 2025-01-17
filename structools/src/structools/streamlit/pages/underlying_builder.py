@@ -3,7 +3,8 @@ import pandas as pd
 import logging
 logging.basicConfig(level=logging.INFO)
 
-from structools.products.basic_products import Underlying, Basket
+from structools.products.basic_products import Underlying, Basket, Index
+from structools.tools.date_tools import L_FREQ
 
 def app():
 
@@ -32,11 +33,11 @@ def app():
 
         col1, col2 = st.columns(2)
         with col1:
-            basket_name = st.text_input("Enter basket name:", "Basket 1")
+            name = st.text_input("Enter basket name:", "Basket 1")
             
             # Validation of the basket name
-            if basket_name in st.session_state.dict_undl.keys():
-                st.warning(f"The underlying named {basket_name} already exists!")
+            if name in st.session_state.dict_undl.keys():
+                st.warning(f"The underlying named {name} already exists!")
             else:
                 st.success("Input name valid!")
 
@@ -44,20 +45,31 @@ def app():
             N = st.number_input("Number of components", 1)
 
 
-        # Worst/Best Of Parameters
         st.markdown('----')
-        col1, col2 = st.columns(2)
-        with col1:
-            worst = st.toggle(label="Worst-Of",
-                      key="wof")
+
+        
+        # If the underlying is a Basket
+        if undl_type == "Basket":
+
+            col1, col2 = st.columns(2)
+            with col1:
+                worst = st.toggle(label="Worst-Of",
+                        key="wof")
+                
+                best = st.toggle(label="Best-Of",
+                        key="bof")
+            with col2:
+                NOF = st.number_input("Number of components to observe for the WoF/BoF", 1)
+                if NOF > N:
+                    st.warning("""The number of observed components cannot be greater than the 
+                            number of underlying's components!""")
+        
+        # The underlying is an Index
+        else:
             
-            best = st.toggle(label="Best-Of",
-                      key="bof")
-        with col2:
-            NOF = st.number_input("Number of components to observe for the WoF/BoF", 1)
-            if NOF > N:
-                st.warning("""The number of observed components cannot be greater than the 
-                           number of underlying's components!""")
+            rebal_freq = st.selectbox("Rebalancing Frequency",
+                                      options=L_FREQ)
+            st.caption("A: Annual, S: Semi-Annual, Q: Quarterly, M: Monthly, W: Weekly")
 
 
 
@@ -83,13 +95,22 @@ def app():
         # Generating the product
         if undl_type == "Basket":
             undl = Basket.from_params(size=1_000_000,
-                                        name=basket_name,
+                                        name=name,
                                         N=NOF,
                                         worst=worst,
                                         best=best,
                                         compo=list(edited_df["Tickers"].astype(str).values),
                                         weights=edited_df["Weights"].astype(float).values
             )
+            st.session_state.dict_undl.update({name: undl})
 
-            st.session_state.dict_undl.update({basket_name: undl})
-            st.success(f"Underlying {basket_name} successfully created!")
+        elif undl_type == "Index":
+            undl = Index.from_params(size=1_000_000,
+                                     name=name,
+                                     rebal_freq=rebal_freq,
+                                     compo=list(edited_df["Tickers"].astype(str).values), 
+                                     weights=edited_df["Weights"].astype(float).values)
+            st.session_state.dict_undl.update({name: undl})
+        
+        
+        st.success(f"Underlying {name} successfully created!")
