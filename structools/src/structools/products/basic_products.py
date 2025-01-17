@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import logging
 from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List
-from structools.tools.date_tools import DateModel
+from structools.tools.date_tools import DateModel, L_FREQ
 from structools.tools.market import Market, L_PRICES
 
 logging.basicConfig(level=logging.INFO)
@@ -307,7 +307,46 @@ class Basket(Underlying):
         return fig
 
 
+class Index(Underlying):
 
+
+    """
+    Class for the representation of an index of stocks.
+    """
+
+    # Additional class parameter
+    rebal_freq : str = Field()
+
+    @classmethod
+    def from_params(cls, 
+                    size,
+                    name,
+                    worst, 
+                    best,
+                    N,
+                    compo,
+                    weights):
+
+        logging.info("Build the basket...")
+        
+        return cls(size=size,
+                   name=name,
+                   WORST=worst,
+                   BEST=best,
+                   N=N,
+                   COMPO=compo,
+                   WEIGHTS=weights)
+    
+
+    # Field validator for the rebalancing frequency
+    @field_validator("rebal_freq", mode="before")
+    def rebal_freq_validation(cls, value):
+
+        if value not in L_FREQ:
+            raise ValueError(f"Frequency {value} not supported. Only accepts: {L_FREQ}")
+        
+        return value
+    
 class OptionBaseModel(BaseModel):
 
     class Config:
