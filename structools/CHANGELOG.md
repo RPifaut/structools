@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.0 (2025-01-17)
+
+### Features
+
+- Backtesting autocalls on custom indices is now available
+  ([`1cb48cd`](https://github.com/RPifaut/structools/commit/1cb48cdc3a67c70d2b6efcfb3a300f3e1e29ac49))
+
+
 ## v0.17.23 (2025-01-17)
 
 ### Bug Fixes
