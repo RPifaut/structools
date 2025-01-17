@@ -142,6 +142,10 @@ def app():
                                      df_track=None,
                                      with_compo = with_compo
             )
+            # Change the color of the underlying to make it stand out in all configuations
+            for trace in fig_track.data:
+                if trace.name == bt_prod.underlying.name:
+                    trace.update(line=dict(color="red", width=1.5))
             fig_track.update_layout(
                 xaxis_title="Dates",
                 yaxis_title="Performance",
