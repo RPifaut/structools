@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.20 (2025-01-17)
+
+### Bug Fixes
+
+- Configuration change to allow inheritance of the plot_track method across underlyings
+  ([`f4c27f7`](https://github.com/RPifaut/structools/commit/f4c27f7f623da52353cb3772f3111c5d6d691f7c))
+
+
 ## v0.17.19 (2025-01-17)
 
 ### Bug Fixes
