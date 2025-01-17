@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.19.3 (2025-01-17)
+
+### Bug Fixes
+
+- Adjusting the generation of the Session State
+  ([`d76b7e5`](https://github.com/RPifaut/structools/commit/d76b7e54b59753c25b0de27213ee04869ae26d12))
+
+
 ## v0.19.2 (2025-01-17)
 
 ### Bug Fixes
