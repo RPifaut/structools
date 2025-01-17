@@ -16,14 +16,19 @@ def app():
             - Then create your Autocallable product. It does not matter how far-fetched your structure is, just describe it, we will backtest it for you!
             - Head over to the backtester where you can chose the combination of product and underlying to backtest.
             - Let the magic do the rest!
+            - Download your backtest results as excel file for further analysis!
                 
 
             *Notes*
             - *Supported products to this date: Athena, Phoenix*
-            - *Supported underlyings: Baskets (Indices in development)*
-                - *Custom weights*
-                - *Worst-Of (Equally weighted of the K worst performing assets among K < N components*
-                - *Best-Of (Equally weighted of the K best performing assets among K < N components*
+            - *Supported underlyings:*
+                - *Baskets*
+                    - *Custom weights*
+                    - *Worst-Of (Equally weighted of the K worst performing assets among K < N components*
+                    - *Best-Of (Equally weighted of the K best performing assets among K < N components*
+
+                - *Indices*
+                    - Generate indices with any standard rebalancing frequencies!
             
             ''')
 
