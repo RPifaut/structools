@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.19.2 (2025-01-17)
+
+### Bug Fixes
+
+- Update the home page of the app
+  ([`9c47fc9`](https://github.com/RPifaut/structools/commit/9c47fc9f8ac30d808890387dcdd7c2348fbb62b1))
+
+
 ## v0.19.1 (2025-01-17)
 
 ### Bug Fixes
