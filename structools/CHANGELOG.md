@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.16 (2025-01-17)
+
+### Bug Fixes
+
+- Adding testing to the README file
+  ([`e20a773`](https://github.com/RPifaut/structools/commit/e20a7732d5e5becf9d898d04e138a0eca03c12d1))
+
+
 ## v0.17.15 (2025-01-17)
 
 ### Bug Fixes
