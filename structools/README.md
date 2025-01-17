@@ -28,6 +28,8 @@ Then open the terminal in the folder where the file launch.py is located and sim
 $ streamlit run launch.py
 ```
 
+Structools offers the possibility to download your backtest results as excel files!
+
 Welcome to Structools!
 
 
