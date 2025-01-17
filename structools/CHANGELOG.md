@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.19 (2025-01-17)
+
+### Bug Fixes
+
+- Adding the method to compute the track of an index
+  ([`c20d7bf`](https://github.com/RPifaut/structools/commit/c20d7bf5217dae40d7d4789976a83effc117a293))
+
+
 ## v0.17.18 (2025-01-17)
 
 ### Bug Fixes
