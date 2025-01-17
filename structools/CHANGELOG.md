@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.1 (2025-01-17)
+
+### Bug Fixes
+
+- Making the trajectories of the underlying stand out Vs. Components
+  ([`8b270a1`](https://github.com/RPifaut/structools/commit/8b270a1dd4ec570ff022ad3ab3af5819848fb6a8))
+
+
 ## v0.18.0 (2025-01-17)
 
 ### Features
