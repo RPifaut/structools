@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.22 (2025-01-17)
+
+### Bug Fixes
+
+- Adding the tests related to the new underlying Index
+  ([`dc4db1f`](https://github.com/RPifaut/structools/commit/dc4db1fee6578f767adf37c47bc2d0af0ff38051))
+
+
 ## v0.17.21 (2025-01-17)
 
 ### Bug Fixes
