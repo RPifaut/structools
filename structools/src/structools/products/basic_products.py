@@ -5,7 +5,7 @@ import plotly.graph_objects as go
 import logging
 from pydantic import BaseModel, Field, field_validator, model_validator
 from typing import List
-from structools.tools.date_tools import DateModel, L_FREQ
+from structools.tools.date_tools import DateModel, L_FREQ, find_dates_index
 from structools.tools.market import Market, L_PRICES
 
 logging.basicConfig(level=logging.INFO)
@@ -25,12 +25,7 @@ class Underlying(BaseModel):
     size : float = Field(1,
                          description="Nominal invested on the basket"
     )
-    name : str = Field(default="AAPL")            
-    N : int = Field(1,
-                    description="In the case of Worst-Of/Best/Of. Number of assets to consider"
-    )                  
-    WORST : bool = Field(False)                
-    BEST : bool = Field(False)      
+    name : str = Field(default="AAPL")                             
     COMPO : List[str] = Field(
         default=["AAPL"],
         description="List of components in the Underlying.",
@@ -71,20 +66,12 @@ class Underlying(BaseModel):
     # Model validation
     @model_validator(mode="after")
     def validate_selection(self):
-
-        # Check Worst-Of/Best-Of Compatibility
-        if self.WORST and self.BEST:
-            raise ValueError("Incompatible selection: the basket cannot be both Worst and Best-Of.")
-
-        # Check the compatilibility of the number of components to be considered for the Worst/best of computation
-        if self.N > len(self.COMPO):
-            raise ValueError(f"Incompatible selection: cannot have more worst/best of  {self.N} elements than basket underlyings {len(self.COMPO)}.")   
         
         # Check compatibility between weights and number of assets
         if len(self.COMPO) != len(self.WEIGHTS):
             raise ValueError(f"Lengths of weights and composition do not match. Got {len(self.COMPO)} components for {len(self.WEIGHTS)} weights.")
 
-        logging.info("Coherent Selection of the basket components. Basket successfully created!")
+        logging.info("Underlying successfully created!")
 
         return self
 
@@ -164,6 +151,13 @@ class Basket(Underlying):
     Class for the representation of a basket of stocks.
     """
 
+    # Additional class attributes
+    N : int = Field(1,
+                    description="In the case of Worst-Of/Best/Of. Number of assets to consider"
+    )    
+    WORST : bool = Field(False)                
+    BEST : bool = Field(False)   
+
     @classmethod
     def from_params(cls, 
                     size,
@@ -174,7 +168,7 @@ class Basket(Underlying):
                     compo,
                     weights):
 
-        logging.info("Build the basket...")
+        logging.info("Build the index...")
         
         return cls(size=size,
                    name=name,
@@ -184,52 +178,20 @@ class Basket(Underlying):
                    COMPO=compo,
                    WEIGHTS=weights)
     
+    # Model validation
+    @model_validator(mode="after")
+    def validate_selection(self):
 
-    # def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None, price : str = 'Close') -> pd.DataFrame:
-
-    #     """
-    #     Method to compute the return of a Basket
-
-    #     Parameters:
-
-    #         start_date(DateModel): Date from which we start loading the data from
-    #         end_date (DateModel): Date at which we stop loading the data
-    #         uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
-    #         price (str): Type of price to be used to compute the Basket's Performance
+        # Check Worst-Of/Best-Of Compatibility
+        if self.WORST and self.BEST:
+            raise ValueError("Incompatible selection: the basket cannot be both Worst and Best-Of.")
         
-    #     Return:
 
-    #         df_perf (pd.DataFrame): Pandas DataFrame containing the returns of the basket's components
-
-    #     """
-
-    #     # Input validation
-    #     if end_date.date < start_date.date:
-    #         raise ValueError("Start date cannot be before end date.")
-
-    #     if price not in L_PRICES:
-    #         raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
+        # Check the compatilibility of the number of components to be considered for the Worst/best of computation
+        if self.N > len(self.COMPO):
+            raise ValueError(f"Incompatible selection: cannot have more worst/best of  {self.N} elements than basket underlyings {len(self.COMPO)}.")   
         
-    #     # Load the data
-    #     if not market:
-    #         logging.info("MISSING Market. Retrieving market data...")
-    #         market = Market.create_market(self.COMPO, start_date, end_date, uniform)
-    #         logging.info("Market Data Sucessfullu loaded.")
-
-    #     # Create a dataframe with the values we are interested in
-    #     df_perf = pd.DataFrame(
-    #         index = market.data[list(market.data.keys())[0]].index,
-    #         columns = self.COMPO
-    #     )
-
-    #     # Create the output DataFrame
-    #     for ticker in market.data:
-    #         df_perf[ticker]=market.data[ticker][price].pct_change().fillna(0)
-
-    #     logging.info("Return computation successfully completed.")
-
-    #     return df_perf
-    
+        logging.info("Basket successfully created!")
 
     def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None) -> pd.DataFrame:
 
@@ -356,15 +318,13 @@ class Index(Underlying):
     """
 
     # Additional class parameter
-    rebal_freq : str = Field()
+    rebal_freq : str = "Q"
 
     @classmethod
     def from_params(cls, 
                     size,
                     name,
-                    worst, 
-                    best,
-                    N,
+                    rebal_freq,
                     compo,
                     weights):
 
@@ -372,9 +332,7 @@ class Index(Underlying):
         
         return cls(size=size,
                    name=name,
-                   WORST=worst,
-                   BEST=best,
-                   N=N,
+                   rebal_freq=rebal_freq,
                    COMPO=compo,
                    WEIGHTS=weights)
     
@@ -387,6 +345,69 @@ class Index(Underlying):
             raise ValueError(f"Frequency {value} not supported. Only accepts: {L_FREQ}")
         
         return value
+    
+
+    def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None) -> pd.DataFrame:
+
+        """
+        This method build the track of the index.
+
+        Parameters:
+
+            - start_date (DateModel): Start date of the track
+            - end_date (DateModel): End date of the track
+            - df_perf (pd.DataFrame): Components performance
+        
+        Returns:
+
+            - df_track (pd.DataFrame): Pandas DataFrame containing the underlying's track
+
+        """
+
+        # Check whether we have the data to compute the performance
+        if df_perf is None:
+            logging.info("MISSING components return. Loading the missing data.")
+            df_perf = self.compute_return_compo(start_date, end_date)  # Only take Close price
+
+        # Create output DataFrame
+        df_track = pd.DataFrame(
+            index=df_perf.index,
+            columns=[self.name, "Return"]
+        )
+        df_track.iloc[0, :] = 1.0
+
+
+        # Rebalancing variables
+        df_perf = df_perf + 1
+        mat_perf = df_perf.to_numpy()
+        mat_weights = np.zeros((df_perf.index.shape[0], self.WEIGHTS.shape[0]))
+        mat_weights[0, :] = self.WEIGHTS
+        next_rebal_date = find_dates_index(start_date.date, 1, self.rebal_freq, df_perf.index)
+        
+        # Iterate over the loaded performances
+        for t in range(1, df_perf.index.shape[0]):  
+
+            # Compute the return and update the portfolio value
+            index_perf = mat_weights[t-1, :].dot(mat_perf[t, :])
+            df_track.iloc[t, 1] = index_perf
+
+            # Update the weights and rebalancing date
+            if t == next_rebal_date:
+                mat_weights[t, :] = self.WEIGHTS
+                next_rebal_date = find_dates_index(df_perf.index[t], 1, self.rebal_freq, df_perf.index)
+
+            else:
+                mat_weights[t, :] = (mat_weights[t-1, :] * mat_perf[t, :]) / index_perf
+
+        # Update the value of the index
+        df_track[self.name] = df_track["Return"].cumprod()
+        df_track["Return"] = df_track["Return"] - 1
+            
+        return df_track
+
+
+
+
     
 class OptionBaseModel(BaseModel):
 
