@@ -15,11 +15,6 @@ from structools.products.basic_products import Underlying
 
 def app():
 
-    # Initilisation of the session state variables
-    if "dict_bt_res" not in st.session_state:
-        st.session_state.dict_bt_res = {}
-
-
     
     st.title("Backtester")
     st.write("Use this tool to backtester your products!")

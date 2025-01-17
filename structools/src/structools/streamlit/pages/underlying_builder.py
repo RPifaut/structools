@@ -8,13 +8,6 @@ from structools.tools.date_tools import L_FREQ
 
 def app():
 
-    # Initialisation of the parameters
-    if "wof" not in st.session_state:
-        st.session_state.wof = False
-    if "bof" not in st.session_state:
-        st.session_state.bof = False
-    if "dict_undl" not in st.session_state:
-        st.session_state.dict_undl={}
 
 
     # Begining of the page

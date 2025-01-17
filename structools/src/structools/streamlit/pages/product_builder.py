@@ -10,10 +10,6 @@ L_PROD = ["Athena", "Phoenix"]
 
 def app():
 
-    # Initialisation of the session_variables
-    if "dict_prod" not in st.session_state:
-        st.session_state.dict_prod={}
-
 
 
     st.title("Product Builder")

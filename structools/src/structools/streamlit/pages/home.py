@@ -4,6 +4,18 @@ from structools.streamlit.pages import underlying_builder, backtester
 
 def app():
 
+    # Initialisation of the parameters
+    if "wof" not in st.session_state:
+        st.session_state.wof = False
+    if "bof" not in st.session_state:
+        st.session_state.bof = False
+    if "dict_undl" not in st.session_state:
+        st.session_state.dict_undl={}
+    if "dict_prod" not in st.session_state:
+        st.session_state.dict_prod={}
+    if "dict_bt_res" not in st.session_state:
+        st.session_state.dict_bt_res = {}
+
     st.title("Welcome to Structools")
     st.text("An innovative platorm designed to help structurers make there life easier.")
 
