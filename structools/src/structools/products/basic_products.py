@@ -124,6 +124,63 @@ class Underlying(BaseModel):
             logging.info("Return computation successfully completed.")
 
             return df_perf
+    
+    def plot_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None, 
+                   df_track : pd.DataFrame = None, with_compo : bool = True):
+
+        """
+        Method that plots the baskets track for a given date.
+
+        Parameters
+
+            - start_date (DateModel): Start date of the track
+            - end_date (DateModel): End date of the track
+            - df_perf (pd.DataFrame): DataFrame containing the returns of the basket's components
+            - df_track (pd.DataFrame) : DataFrame containing the returns of the basket itself
+            - with_compo (pd.DataFrame) : Boolean to decide whether to plot the components alongside the index
+
+        Returns:
+
+            - fig (px.Figure): Plotly Figure object 
+
+        """
+
+        # Check whether all the necessary data has been provided
+        if df_track is None:
+            logging.info("MISSING Track record. Loading the data and building the track record.")
+            df_track = self.build_track(start_date, end_date, df_perf)
+        if df_perf is None and with_compo:
+            logging.info("MISSING components returns. Loading the data.")
+            df_perf = self.compute_return_compo(start_date, end_date)
+
+        # Create the figure
+        fig = go.Figure()
+
+        # Plot the components if required
+        if with_compo:
+            df_perf = (df_perf + 1).cumprod()
+            for elem in df_perf.columns:
+                fig.add_trace(
+                    go.Scatter(
+                        x=df_perf.index, 
+                        y=df_perf.loc[:, elem],
+                        mode='lines',
+                        name=elem
+                    )
+                )
+
+        # Plotting the track of the basket
+        fig.add_trace(
+            go.Scatter(
+                x=df_track.index, 
+                y=df_track[self.name],
+                mode='lines',
+                name=self.name,
+                line=dict(width=2, color='black')
+            )
+        )
+
+        return fig
 
     def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None):
 
@@ -404,7 +461,6 @@ class Index(Underlying):
         df_track["Return"] = df_track["Return"] - 1
             
         return df_track
-
 
 
 
