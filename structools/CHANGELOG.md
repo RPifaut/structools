@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.21 (2025-01-17)
+
+### Bug Fixes
+
+- Adjustement regarding last commit - removing the definition of the plotting method in baskets
+  ([`607785b`](https://github.com/RPifaut/structools/commit/607785b403769d700bb815ef35f0ff7994a64d35))
+
+
 ## v0.17.20 (2025-01-17)
 
 ### Bug Fixes
