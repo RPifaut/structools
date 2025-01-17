@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.19.0 (2025-01-17)
+
+### Features
+
+- Adding possiblity to download backtest results as excel files
+  ([`a4d7455`](https://github.com/RPifaut/structools/commit/a4d74552a431c754d579fd2860723f72be15b442))
+
+
 ## v0.18.3 (2025-01-17)
 
 ### Bug Fixes
