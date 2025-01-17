@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.17 (2025-01-17)
+
+### Bug Fixes
+
+- Creating new underlying child class: Index
+  ([`feae273`](https://github.com/RPifaut/structools/commit/feae2734502d7da1021d593523cf4186dabbb46c))
+
+
 ## v0.17.16 (2025-01-17)
 
 ### Bug Fixes
