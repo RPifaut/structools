@@ -30,17 +30,6 @@ $ streamlit run launch.py
 
 Welcome to Structools!
 
-## Testing 
-
-You can easily test that the package has been properly installed by creating a python file test.py (or any name you want) containing the following lines
-
-```python
-from structools.test import run_tests
-
-if __name__ == "__main__":
-
-    run_tests()
-```
 
 ## Advanced/Further Development
 
