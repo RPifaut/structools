@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.17.18 (2025-01-17)
+
+### Bug Fixes
+
+- Structure code change - compute_return_compo moved to parent class
+  ([`250f79f`](https://github.com/RPifaut/structools/commit/250f79fb40c5dd6f3cd6198f82f59fb7d3713600))
+
+
 ## v0.17.17 (2025-01-17)
 
 ### Bug Fixes
