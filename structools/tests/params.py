@@ -1,6 +1,6 @@
 import numpy as np
 from structools.tools.date_tools import DateModel
-from structools.products.basic_products import Underlying, Basket
+from structools.products.basic_products import Underlying, Basket, Index
 
 """
 File containing default parameters for the tests
@@ -20,6 +20,8 @@ BASKET = Basket.from_params(size=1_000_000,
                             N=1,
                             compo=L_COMPO,
                             weights=WEIGHTS)
+
+INDEX = Index.from_params(10000, "Custom Index", "A", L_COMPO, WEIGHTS)
 
 
 # Autocall Params

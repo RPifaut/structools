@@ -28,7 +28,7 @@ def test_basket_initialisation():
         
         # Wrong weights selection
         basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=False,
-                                N=4, compo=L_COMPO[:-1], weights=np.arange(len(L_COMPO)))
+                                N=4, compo=L_COMPO, weights=np.arange(len(L_COMPO)))
 
         # Selecting worst and best of at the same time
         basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=True,
@@ -60,6 +60,25 @@ def test_basket_track():
     assert df_track.shape[1] == 2
     assert df_track.shape[0] == 4562
 
+
+def test_index_initialisation():
+
+    # Corretly selected basket
+    index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq="A", compo=L_COMPO, weights=WEIGHTS)
+
+    assert isinstance(index, Underlying)
+
+    with pytest.raises(ValidationError):
+        # Wrong not matching number of components and weights
+        index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq="A", compo=L_COMPO[:-1], weights=WEIGHTS)
+        
+        # Wrong weights selection
+        index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq = "A", compo=L_COMPO, weights=np.arange(len(L_COMPO)))
+
+        # Selecting wrong rebalancing frequency
+        index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq = "E", weights=np.arange(len(L_COMPO)))
+
+
 def test_plot():
 
     basket = Basket.from_params(size = 1_000_000, name="Basket Test", worst=True, best=False,
@@ -73,6 +92,22 @@ def test_plot():
     df_track = basket.build_track(START_DATE, END_DATE)
     fig = basket.plot_track(START_DATE, END_DATE, df_track=df_track)
     assert isinstance(fig, go.Figure)
+
+
+def test_index_track():
+
+    index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq="A", compo=L_COMPO, weights=WEIGHTS)
+    
+    # Without df_ret_compo passed as argument
+    df_track = index.build_track(START_DATE, END_DATE)
+    assert df_track.shape[1] == 2
+    assert df_track.shape[0] == 4562
+
+    # With the df_ret passed as an argument
+    df_ret = index.compute_return_compo(START_DATE, END_DATE)
+    df_track = index.build_track(START_DATE, END_DATE, df_ret)
+    assert df_track.shape[1] == 2
+    assert df_track.shape[0] == 4562
 
 
 

@@ -17,17 +17,17 @@ from structools.tools.market import Market, load_stocks_data
 from tests.params import *
 
 
-# Backtesting Athena - Phoenix
+# my_index = Index.from_params(100000, name="test", rebal_freq="A", compo=["AAPL", "MSFT"], weights=np.array([0.5, 0.5]))
+my_index = Index.from_params(size = 1_000_000, name="Index Test", rebal_freq="A", compo=L_COMPO, weights=WEIGHTS)
+df_perf = my_index.compute_return_compo(START_DATE, END_DATE, True)
+df_track = my_index.build_track(START_DATE, END_DATE, None)
+print(df_track.shape)
+
+# # Backtesting Athena - Phoenix
 # dict_athena = DICT_ATHENA.copy()
-# dict_athena["underlying"] = BASKET
+# dict_athena["underlying"] = INDEX
 # athena = Athena.from_params(**dict_athena)
 # bt_athena = Backtester.init_backtester(product=athena, backtest_length=10, 
 #                                         investment_horizon=athena.maturity)
 # res_athena = bt_athena.backtest_autocall()
-
-my_index = Index.from_params(100000, name="test", rebal_freq="W", compo=["AAPL", "MSFT"], weights=np.array([0.5, 0.5]))
-df_perf = my_index.compute_return_compo(START_DATE, END_DATE, True)
-df_track = my_index.build_track(START_DATE, END_DATE, None)
-idx = find_dates_index(START_DATE.date, 1, my_index.rebal_freq, df_perf.index)
-fig = my_index.plot_track(START_DATE, END_DATE, None, None, True)
-fig.show()
+# print(res_athena)
