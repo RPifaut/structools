@@ -93,9 +93,50 @@ class Underlying(BaseModel):
 
         pass
     
-    def compute_return_compo(self, tickers : List[str], start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None):
+    def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None, price : str = 'Close') -> pd.DataFrame:
 
-        pass
+            """
+            Method to compute the return of the composition
+
+            Parameters:
+
+                start_date(DateModel): Date from which we start loading the data from
+                end_date (DateModel): Date at which we stop loading the data
+                uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
+                price (str): Type of price to be used to compute the Basket's Performance
+            
+            Return:
+
+                df_perf (pd.DataFrame): Pandas DataFrame containing the returns of the basket's components
+
+            """
+
+            # Input validation
+            if end_date.date < start_date.date:
+                raise ValueError("Start date cannot be before end date.")
+
+            if price not in L_PRICES:
+                raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
+            
+            # Load the data
+            if not market:
+                logging.info("MISSING Market. Retrieving market data...")
+                market = Market.create_market(self.COMPO, start_date, end_date, uniform)
+                logging.info("Market Data Sucessfullu loaded.")
+
+            # Create a dataframe with the values we are interested in
+            df_perf = pd.DataFrame(
+                index = market.data[list(market.data.keys())[0]].index,
+                columns = self.COMPO
+            )
+
+            # Create the output DataFrame
+            for ticker in market.data:
+                df_perf[ticker]=market.data[ticker][price].pct_change().fillna(0)
+
+            logging.info("Return computation successfully completed.")
+
+            return df_perf
 
     def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None):
 
@@ -144,50 +185,50 @@ class Basket(Underlying):
                    WEIGHTS=weights)
     
 
-    def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None, price : str = 'Close') -> pd.DataFrame:
+    # def compute_return_compo(self, start_date : DateModel, end_date : DateModel, uniform : bool = True, market : Market = None, price : str = 'Close') -> pd.DataFrame:
 
-        """
-        Method to compute the return of a Basket
+    #     """
+    #     Method to compute the return of a Basket
 
-        Parameters:
+    #     Parameters:
 
-            start_date(DateModel): Date from which we start loading the data from
-            end_date (DateModel): Date at which we stop loading the data
-            uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
-            price (str): Type of price to be used to compute the Basket's Performance
+    #         start_date(DateModel): Date from which we start loading the data from
+    #         end_date (DateModel): Date at which we stop loading the data
+    #         uniform (bool): Only keep the values for which quotations for all the composants are available. Default is true
+    #         price (str): Type of price to be used to compute the Basket's Performance
         
-        Return:
+    #     Return:
 
-            df_perf (pd.DataFrame): Pandas DataFrame containing the returns of the basket's components
+    #         df_perf (pd.DataFrame): Pandas DataFrame containing the returns of the basket's components
 
-        """
+    #     """
 
-        # Input validation
-        if end_date.date < start_date.date:
-            raise ValueError("Start date cannot be before end date.")
+    #     # Input validation
+    #     if end_date.date < start_date.date:
+    #         raise ValueError("Start date cannot be before end date.")
 
-        if price not in L_PRICES:
-            raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
+    #     if price not in L_PRICES:
+    #         raise ValueError(f"Type of price not supported. Available price types: {L_PRICES}")
         
-        # Load the data
-        if not market:
-            logging.info("MISSING Market. Retrieving market data...")
-            market = Market.create_market(self.COMPO, start_date, end_date, uniform)
-            logging.info("Market Data Sucessfullu loaded.")
+    #     # Load the data
+    #     if not market:
+    #         logging.info("MISSING Market. Retrieving market data...")
+    #         market = Market.create_market(self.COMPO, start_date, end_date, uniform)
+    #         logging.info("Market Data Sucessfullu loaded.")
 
-        # Create a dataframe with the values we are interested in
-        df_perf = pd.DataFrame(
-            index = market.data[list(market.data.keys())[0]].index,
-            columns = self.COMPO
-        )
+    #     # Create a dataframe with the values we are interested in
+    #     df_perf = pd.DataFrame(
+    #         index = market.data[list(market.data.keys())[0]].index,
+    #         columns = self.COMPO
+    #     )
 
-        # Create the output DataFrame
-        for ticker in market.data:
-            df_perf[ticker]=market.data[ticker][price].pct_change().fillna(0)
+    #     # Create the output DataFrame
+    #     for ticker in market.data:
+    #         df_perf[ticker]=market.data[ticker][price].pct_change().fillna(0)
 
-        logging.info("Return computation successfully completed.")
+    #     logging.info("Return computation successfully completed.")
 
-        return df_perf
+    #     return df_perf
     
 
     def build_track(self, start_date : DateModel, end_date : DateModel, df_perf : pd.DataFrame = None) -> pd.DataFrame:
