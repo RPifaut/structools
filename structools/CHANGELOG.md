@@ -1,6 +1,15 @@
 # CHANGELOG
 
 
+## v0.18.2 (2025-01-17)
+
+### Bug Fixes
+
+- Last minute fix - removing the testing procedure because causes errors between developing
+  environment and PyPI installation
+  ([`ad1cd90`](https://github.com/RPifaut/structools/commit/ad1cd90e583e248552dee71b52890c9dbfb44308))
+
+
 ## v0.18.1 (2025-01-17)
 
 ### Bug Fixes
