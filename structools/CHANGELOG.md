@@ -1,6 +1,14 @@
 # CHANGELOG
 
 
+## v0.18.3 (2025-01-17)
+
+### Bug Fixes
+
+- Quick fix
+  ([`cea86b4`](https://github.com/RPifaut/structools/commit/cea86b452efaf0aedc15076bef5c3d3de54905b2))
+
+
 ## v0.18.2 (2025-01-17)
 
 ### Bug Fixes
