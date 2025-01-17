@@ -1,5 +1,6 @@
 import streamlit as st
 import time
+import io
 import pandas as pd
 import numpy as np
 import plotly.graph_objects as go
@@ -190,8 +191,67 @@ def app():
             st.table(df_irr)
 
 
+            def generate_excel():
 
+                """
+                Function to generate the results. Only called if the button download has been pressed.
+                """
 
+                # Create an excel file to store the results
+                output = io.BytesIO()
+                with pd.ExcelWriter(output, engine="xlsxwriter") as writer:
 
+                    # Sheet 1 - Results - Save the backtest results dataframe
+                    df_ac_proba.to_excel(writer, sheet_name="Results", startrow=0, startcol=0)
+                    df_irr.to_excel(writer, sheet_name="Results", startrow=df_ac_proba.shape[0] + 2, startcol=0)
+                    workbook = writer.book
+                    worksheet = writer.sheets["Results"]
 
-                
+                    # Adding the charts
+                    img_track = io.BytesIO()
+                    fig_track.write_image(img_track, format="png")
+                    img_track.seek(0)
+                    worksheet.insert_image(0, max(df_ac_proba.shape[1], df_irr.shape[1]) + 4, "fig_track.png", {"image_data": img_track})
+
+                    # Insert the second plot (fig_proba)
+                    img_proba = io.BytesIO()
+                    fig_proba.write_image(img_proba, format="png")
+                    img_proba.seek(0)
+                    worksheet.insert_image(24, max(df_ac_proba.shape[1], df_irr.shape[1]) + 4, "fig_proba.png", {"image_data": img_proba})
+
+                    # Store the dataused for the backtest on the other sheets
+                    arr_dates = dict_res["Data"]["Dates"]
+                    df_dates = pd.DataFrame(
+                        index = [f"Simulation {i+1}" for i in range(arr_dates.shape[0])],
+                        columns = ["Start Date"] + [f"Period {i}" for i in range(1, arr_dates.shape[1])],
+                        data=arr_dates
+                    )
+                    df_dates.to_excel(writer, sheet_name="Observation Dates")
+
+                    arr_obs = dict_res["Data"]["Observations"]
+                    df_obs = pd.DataFrame(
+                        index=[f"Simulation {i+1}" for i in range(arr_obs.shape[0])],
+                        columns=["Strike Spot"] + [f"Period {i}" for i in range(1, arr_obs.shape[1])],
+                        data=arr_obs
+                    )
+                    df_obs.to_excel(writer, sheet_name="Observation Spots")
+
+                    arr_cf = dict_res["Data"]["Cashflows"]
+                    df_cf = pd.DataFrame(
+                        index=[f"Simulation {i+1}" for i in range(arr_cf.shape[0])],
+                        columns=[f"Period {i+1}" for i in range(arr_cf.shape[1])],
+                        data=arr_cf
+                    )
+                    df_cf.to_excel(writer, sheet_name="Cashflows")
+
+                return output
+
+            st.subheader("Download Backtest Results")
+            st.download_button(
+            label="Download",
+            data=generate_excel(),
+            file_name=f"{bt_name}.xlsx",
+            mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+)
+            
+
